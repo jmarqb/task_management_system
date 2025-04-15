@@ -15,6 +15,7 @@
     <modules>
         <module>config-server</module>
         <module>api-gateway</module>
+        <module>ms-auth</module>
     </modules>
     <properties>
         <java.version>21</java.version>
