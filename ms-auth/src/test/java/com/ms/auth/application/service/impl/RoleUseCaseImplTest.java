@@ -1,0 +1,199 @@
+package com.ms.auth.application.service.impl;
+
+import com.ms.auth.application.impl.RoleUseCaseImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+
+import java.util.List;
+
+import com.ms.auth.application.exceptions.RoleNotFoundException;
+import com.ms.auth.domain.model.Role;
+import com.ms.auth.domain.ports.output.persistence.RolePersistencePort;
+import org.instancio.Instancio;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import static com.ms.auth.data.Data.createRole;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+class RoleUseCaseImplTest {
+
+
+	private @Mock RolePersistencePort rolePersistencePort;
+
+	private @InjectMocks RoleUseCaseImpl roleUseCaseImpl;
+
+	@Test
+	void save() {
+		Role inputRole = createRole(1L);
+
+		when(rolePersistencePort.save(any(Role.class))).thenReturn(inputRole);
+
+		Role savedRole = roleUseCaseImpl.save(inputRole);
+
+		assertEquals(inputRole.getId(), savedRole.getId());
+		assertEquals(inputRole.getName(), savedRole.getName());
+		assertEquals(inputRole.getDescription(), savedRole.getDescription());
+		assertEquals(inputRole.getIcon(), savedRole.getIcon());
+		assertEquals(inputRole.isAdmin(), savedRole.isAdmin());
+		assertEquals(inputRole.isDefaultRole(), savedRole.isDefaultRole());
+		assertEquals(inputRole.isDeleted(), savedRole.isDeleted());
+		assertEquals(inputRole.getDeletedAt(), savedRole.getDeletedAt());
+
+		verify(rolePersistencePort).save(savedRole);
+	}
+
+	@Test
+	void searchContainsRegex() {
+		Role inputRole = createRole(1L);
+		String searchRegex = inputRole.getName().substring(0, 3);
+
+		int page = 0;
+		int size = 10;
+		String sort = "ASC";
+
+		List<Role> expectedRoles = List.of(inputRole);
+
+		when(rolePersistencePort
+			.searchAllByRegex(searchRegex, PageRequest.of(page, size, Sort.Direction.ASC, "id")))
+			.thenReturn(expectedRoles);
+
+		List<Role> actualRoles = roleUseCaseImpl.search(searchRegex, page, size, sort);
+
+		assertThat(actualRoles).isEqualTo(expectedRoles);
+		verify(rolePersistencePort).searchAllByRegex(searchRegex, PageRequest.of(page, size, Sort.Direction.ASC, "id"));
+	}
+
+	@Test
+	void searchNotRegex() {
+		Role inputRole = createRole(1L);
+		int page = 0;
+		int size = 10;
+		String sort = "ASC";
+
+		List<Role> expectedRoles = List.of(inputRole);
+
+		when(rolePersistencePort
+			.searchAll(PageRequest.of(page, size, Sort.Direction.ASC, "id")))
+			.thenReturn(expectedRoles);
+
+		List<Role> actualRoles = roleUseCaseImpl.search(null, page, size, sort);
+
+
+		assertThat(actualRoles).isEqualTo(expectedRoles);
+		verify(rolePersistencePort).searchAll(PageRequest.of(page, size, Sort.Direction.ASC, "id"));
+	}
+
+	@Test
+	void findRole() {
+		Role inputRole = createRole(1L);
+
+		when(rolePersistencePort.findByIdAndDeletedFalse(inputRole.getId()))
+			.thenReturn(inputRole);
+
+		Role actualRole = roleUseCaseImpl.findRole(inputRole.getId());
+
+		assertThat(actualRole).isEqualTo(inputRole);
+		verify(rolePersistencePort).findByIdAndDeletedFalse(inputRole.getId());
+	}
+
+	@Test
+	void findRoleNotFound() {
+		Long someUid = 1L;
+
+		when(rolePersistencePort.findByIdAndDeletedFalse(someUid)).thenThrow(
+			new RoleNotFoundException("Role with %s not found".formatted(someUid)));
+
+		RoleNotFoundException exception = assertThrows(
+			RoleNotFoundException.class, () -> roleUseCaseImpl.findRole(someUid));
+
+		assertThat(exception.getMessage()).isEqualTo("Role with %s not found".formatted(someUid));
+		verify(rolePersistencePort).findByIdAndDeletedFalse(someUid);
+	}
+
+	@Test
+	void updateRole() {
+		Role dataToUpdateRole = createRole(1L);
+		Long id = dataToUpdateRole.getId();
+
+		Role role = Instancio.create(Role.class);
+		role.setId(id);
+		role.setName(dataToUpdateRole.getName());
+		role.setDescription(dataToUpdateRole.getDescription());
+
+		when(rolePersistencePort.findByIdAndDeletedFalse(id))
+			.thenReturn(role);
+
+		when(rolePersistencePort.save(role)).thenReturn(role);
+
+		Role actualRole = roleUseCaseImpl.updateRole(dataToUpdateRole);
+
+		assertThat(actualRole).isEqualTo(role);
+		verify(rolePersistencePort).findByIdAndDeletedFalse(id);
+		verify(rolePersistencePort).save(role);
+	}
+
+	@Test
+	void updateRoleNotFound() {
+		Role dataToUpdateRole = createRole(1L);
+
+		when(rolePersistencePort.findByIdAndDeletedFalse(dataToUpdateRole.getId())).thenThrow(
+			new RoleNotFoundException("Role with %s not found".formatted(dataToUpdateRole.getId())));
+
+		RoleNotFoundException exception = assertThrows(
+			RoleNotFoundException.class, () -> roleUseCaseImpl.updateRole(dataToUpdateRole));
+
+		assertThat(exception.getMessage()).isEqualTo("Role with %s not found".formatted(dataToUpdateRole.getId()));
+		verify(rolePersistencePort).findByIdAndDeletedFalse(dataToUpdateRole.getId());
+	}
+
+	@Test
+	void deleteRole() {
+		Role role = createRole(1L);
+
+		when(rolePersistencePort.findByIdAndDeletedFalse(role.getId()))
+			.thenReturn(role);
+
+		roleUseCaseImpl.deleteRole(role.getId());
+
+		assertThat(role.isDeleted()).isTrue();
+		assertThat(role.getDeletedAt()).isNotNull();
+
+		verify(rolePersistencePort).findByIdAndDeletedFalse(role.getId());
+		verify(rolePersistencePort).save(role);
+	}
+
+	@Test
+	void deleteRoleNotFound() {
+		Long someUid = 1L;
+
+		when(rolePersistencePort.findByIdAndDeletedFalse(someUid)).thenThrow(
+			new RoleNotFoundException("Role with %s not found".formatted(someUid)));
+
+		RoleNotFoundException exception = assertThrows(
+			RoleNotFoundException.class, () -> roleUseCaseImpl.deleteRole(someUid));
+
+		assertThat(exception.getMessage()).isEqualTo("Role with %s not found".formatted(someUid));
+		verify(rolePersistencePort).findByIdAndDeletedFalse(someUid);
+	}
+
+	@Test
+	void existRole() {
+		Long someUid = 1L;
+		when(rolePersistencePort.findByIdAndDeletedFalse(someUid)).thenReturn(null);
+
+		RoleNotFoundException exception = assertThrows(
+			RoleNotFoundException.class, () -> roleUseCaseImpl.existsRole(someUid));
+
+		assertThat(exception.getMessage()).isEqualTo("The role does not exist");
+		verify(rolePersistencePort).findByIdAndDeletedFalse(someUid);
+	}
+}
