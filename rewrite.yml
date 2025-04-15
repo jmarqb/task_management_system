@@ -1,0 +1,43 @@
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: com.jmarqb.task.management.system.Recipe
+recipeList:
+  - org.openrewrite.java.RemoveUnusedImports
+  - org.openrewrite.java.OrderImports
+  - org.openrewrite.java.format.AutoFormat
+  - org.openrewrite.java.format.MethodParamPad
+  - org.openrewrite.hcl.format.RemoveTrailingWhitespace
+  - org.openrewrite.java.format.TypecastParenPad
+  - org.openrewrite.java.migrate.UpgradeBuildToJava21
+  - org.openrewrite.java.spring.boot3.SpringBoot3BestPractices
+  - org.openrewrite.java.migrate.lombok.LombokBestPractices
+  - org.openrewrite.java.testing.assertj.JUnitToAssertj
+  - org.openrewrite.java.testing.junit5.JUnit5BestPractices
+  - org.openrewrite.staticanalysis.JavaApiBestPractices
+---
+type: specs.openrewrite.org/v1beta/style
+name: com.jmarqb.task.management.system.Style
+styleConfigs:
+  - org.openrewrite.java.style.ImportLayoutStyle:
+      classCountToUseStarImport: 999
+      nameCountToUseStarImport: 999
+      layout:
+        - import com.jmarqb.task.management.system.*
+        - import static com.jmarqb.task.management.system.*
+        - <blank line>
+        - import org.springframework.*
+        - import static org.springframework.*
+        - <blank line>
+        - import jakarta.*
+        - import java.*
+        - <blank line>
+        - import lombok.*
+        - <blank line>
+        - import all other imports
+        - import static all other imports
+  - org.openrewrite.java.style.TabsAndIndentsStyle:
+      useTabCharacter: true
+      tabSize: 2
+      indentSize: 2
+      continuationIndent: 2
+      indentsRelativeToExpressionStart: true
