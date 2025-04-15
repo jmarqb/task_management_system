@@ -1,0 +1,16 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      mvc:
+        routes:
+          - id: ms-auth
+            uri: http://localhost:8081
+            predicates:
+              - Path=/api/users/**, /api/roles/**, /api/auth/**
+
+
