@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: ms-auth
+  banner:
+    location: http://config-server:8888/config/banner.txt
+  config:
+    import:
+      - configserver:${CONFIG_SERVER_URI:http://localhost:8888/config/}
