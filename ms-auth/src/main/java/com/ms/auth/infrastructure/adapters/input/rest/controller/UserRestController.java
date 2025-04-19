@@ -6,7 +6,9 @@ import org.springframework.stereotype.Controller;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import lombok.RequiredArgsConstructor;
 
@@ -14,9 +16,11 @@ import com.ms.auth.application.ports.input.UserUseCase;
 import com.ms.auth.domain.model.User;
 import com.ms.auth.infrastructure.adapters.input.rest.dtos.request.SearchBodyDto;
 import com.ms.auth.infrastructure.adapters.input.rest.dtos.request.UpdateUserDto;
+import com.ms.auth.infrastructure.adapters.input.rest.dtos.request.ValidateUsersDto;
 import com.ms.auth.infrastructure.adapters.input.rest.dtos.response.CreateUserResponseDto;
 import com.ms.auth.infrastructure.adapters.input.rest.dtos.response.DeleteResponseDto;
 import com.ms.auth.infrastructure.adapters.input.rest.dtos.response.PaginatedResponseDto;
+import com.ms.auth.infrastructure.adapters.input.rest.dtos.response.PartialUserResponseDto;
 import com.ms.auth.infrastructure.adapters.input.rest.mapper.UserMapper;
 import com.ms.auth.infrastructure.adapters.input.rest.ui.UserRestUI;
 
@@ -57,5 +61,15 @@ public class UserRestController implements UserRestUI {
 	public ResponseEntity<DeleteResponseDto> removeUser(Long id) {
 		userUseCase.deleteUser(id);
 		return new ResponseEntity<>(new DeleteResponseDto(true, 1), HttpStatus.OK);
+	}
+
+	@Override
+	public Set<PartialUserResponseDto> validateUsers(ValidateUsersDto validateUsersDto) {
+		Set<PartialUserResponseDto> userList = new HashSet<>();
+		for (Long id : validateUsersDto.getUsersIds()) {
+			User user = userUseCase.findUser(id);
+			userList.add(userMapper.toPartialResponse(user));
+		}
+		return userList;
 	}
 }
