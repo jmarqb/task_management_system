@@ -1,12 +1,12 @@
 package com.ms.auth.application.service.impl;
 
-import com.ms.auth.application.impl.RoleUseCaseImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
 import com.ms.auth.application.exceptions.RoleNotFoundException;
+import com.ms.auth.application.impl.RoleUseCaseImpl;
 import com.ms.auth.domain.model.Role;
 import com.ms.auth.domain.ports.output.persistence.RolePersistencePort;
 import org.instancio.Instancio;
@@ -17,7 +17,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import static com.ms.auth.data.Data.createRole;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -39,14 +38,14 @@ class RoleUseCaseImplTest {
 
 		Role savedRole = roleUseCaseImpl.save(inputRole);
 
-		assertEquals(inputRole.getId(), savedRole.getId());
-		assertEquals(inputRole.getName(), savedRole.getName());
-		assertEquals(inputRole.getDescription(), savedRole.getDescription());
-		assertEquals(inputRole.getIcon(), savedRole.getIcon());
-		assertEquals(inputRole.isAdmin(), savedRole.isAdmin());
-		assertEquals(inputRole.isDefaultRole(), savedRole.isDefaultRole());
-		assertEquals(inputRole.isDeleted(), savedRole.isDeleted());
-		assertEquals(inputRole.getDeletedAt(), savedRole.getDeletedAt());
+		assertThat(savedRole.getId()).isEqualTo(inputRole.getId());
+		assertThat(savedRole.getName()).isEqualTo(inputRole.getName());
+		assertThat(savedRole.getDescription()).isEqualTo(inputRole.getDescription());
+		assertThat(savedRole.getIcon()).isEqualTo(inputRole.getIcon());
+		assertThat(savedRole.isAdmin()).isEqualTo(inputRole.isAdmin());
+		assertThat(savedRole.isDefaultRole()).isEqualTo(inputRole.isDefaultRole());
+		assertThat(savedRole.isDeleted()).isEqualTo(inputRole.isDeleted());
+		assertThat(savedRole.getDeletedAt()).isEqualTo(inputRole.getDeletedAt());
 
 		verify(rolePersistencePort).save(savedRole);
 	}

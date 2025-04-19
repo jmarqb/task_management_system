@@ -1,9 +1,9 @@
 package com.ms.auth.application.ports.input;
 
-import com.ms.auth.domain.model.CustomUserDetails;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.springframework.security.core.userdetails.UserDetails;
+import com.ms.auth.domain.model.CustomUserDetails;
 
 public interface JwtUseCase {
 

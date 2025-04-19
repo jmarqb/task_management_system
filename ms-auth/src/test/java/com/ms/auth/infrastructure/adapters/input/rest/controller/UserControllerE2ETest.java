@@ -1,6 +1,5 @@
 package com.ms.auth.infrastructure.adapters.input.rest.controller;
 
-import com.ms.auth.domain.model.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -24,6 +23,7 @@ import java.util.List;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.ms.auth.application.ports.input.JwtUseCase;
 import com.ms.auth.data.seed.TestDataInitializer;
+import com.ms.auth.domain.model.CustomUserDetails;
 import com.ms.auth.domain.model.Error;
 import com.ms.auth.infrastructure.adapters.input.rest.dtos.request.CreateUserDto;
 import com.ms.auth.infrastructure.adapters.input.rest.dtos.request.SearchBodyDto;
@@ -41,9 +41,7 @@ import static com.ms.auth.data.Data.createAdminUserResponseDto;
 import static com.ms.auth.data.Data.createSearchBodyDto;
 import static com.ms.auth.data.Data.createUserDto;
 import static com.ms.auth.data.Data.createUserResponseDto;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
@@ -68,7 +66,7 @@ public class UserControllerE2ETest {
 		List<GrantedAuthority> authorities = new ArrayList<>();
 		authorities.add(new SimpleGrantedAuthority("ADMIN"));
 		CustomUserDetails user = new CustomUserDetails(
-				1L,
+			1L,
 			"testadmin@example.com",
 			"password",
 			true,
@@ -113,16 +111,16 @@ public class UserControllerE2ETest {
 		ResponseEntity<PaginatedResponseDto> response = client.postForEntity(createURI("/api/users/search"),
 			searchBodyDto, PaginatedResponseDto.class);
 
-		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType());
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
 
 		PaginatedResponseDto body = response.getBody();
 
-		assertNotNull(body);
-		assertEquals(1, body.getData().size());
-		assertEquals(0, body.getPage());
-		assertEquals(10, body.getSize());
-		assertEquals(1, body.getTotal());
+		assertThat(body).isNotNull();
+		assertThat(body.getData().size()).isEqualTo(1);
+		assertThat(body.getPage()).isEqualTo(0);
+		assertThat(body.getSize()).isEqualTo(10);
+		assertThat(body.getTotal()).isEqualTo(1);
 	}
 
 	@Test
@@ -211,14 +209,14 @@ public class UserControllerE2ETest {
 			DeleteResponseDto.class
 		);
 
-		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType());
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
 
 		DeleteResponseDto body = response.getBody();
 
-		assertNotNull(body);
-		assertEquals(1, body.getDeletedCount());
-		assertTrue(body.isAcknowledged());
+		assertThat(body).isNotNull();
+		assertThat(body.getDeletedCount()).isEqualTo(1);
+		assertThat(body.isAcknowledged()).isTrue();
 
 		ResponseEntity<Error> findUserAfterDelete = client.getForEntity(
 			createURI("/api/users/%d".formatted(2L)),
@@ -229,35 +227,35 @@ public class UserControllerE2ETest {
 
 
 	private void checkedResponseEntity(ResponseEntity<CreateUserResponseDto> response, CreateUserResponseDto expected,
-																		 HttpStatus status) {
-		assertEquals(status, response.getStatusCode());
-		assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType());
+																		HttpStatus status) {
+		assertThat(response.getStatusCode()).isEqualTo(status);
+		assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
 
 		CreateUserResponseDto body = response.getBody();
 
-		assertNotNull(body);
-		assertEquals(expected.getFirstName(), body.getFirstName());
-		assertEquals(expected.getLastName(), body.getLastName());
-		assertEquals(expected.getEmail(), body.getEmail());
-		assertEquals(expected.getPhone(), body.getPhone());
-		assertEquals(expected.getGender(), body.getGender());
-		assertEquals(expected.getCountry(), body.getCountry());
-		assertEquals(expected.isDeleted(), body.isDeleted());
-		assertEquals(expected.getDeletedAt(), body.getDeletedAt());
-		assertEquals(expected.getId(), body.getId());
+		assertThat(body).isNotNull();
+		assertThat(body.getFirstName()).isEqualTo(expected.getFirstName());
+		assertThat(body.getLastName()).isEqualTo(expected.getLastName());
+		assertThat(body.getEmail()).isEqualTo(expected.getEmail());
+		assertThat(body.getPhone()).isEqualTo(expected.getPhone());
+		assertThat(body.getGender()).isEqualTo(expected.getGender());
+		assertThat(body.getCountry()).isEqualTo(expected.getCountry());
+		assertThat(body.isDeleted()).isEqualTo(expected.isDeleted());
+		assertThat(body.getDeletedAt()).isEqualTo(expected.getDeletedAt());
+		assertThat(body.getId()).isEqualTo(expected.getId());
 	}
 
 	public void checkedErrorResponseEntity(ResponseEntity<Error> response, HttpStatus status) {
-		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-		assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType());
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+		assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
 
 		Error body = response.getBody();
 
-		assertNotNull(body);
+		assertThat(body).isNotNull();
 
-		assertEquals(HttpStatus.NOT_FOUND.value(), body.getStatus());
-		assertEquals("NOT FOUND", body.getError());
-		assertEquals("The user does not exist", body.getMessage());
+		assertThat(body.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
+		assertThat(body.getError()).isEqualTo("NOT FOUND");
+		assertThat(body.getMessage()).isEqualTo("The user does not exist");
 	}
 
 	private String createURI(String uri) {

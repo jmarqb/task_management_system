@@ -1,23 +1,22 @@
 package com.ms.auth.application.service.impl;
 
-import com.ms.auth.application.impl.AuthUseCaseImpl;
-import com.ms.auth.domain.model.CustomUserDetails;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.ms.auth.application.impl.AuthUseCaseImpl;
 import com.ms.auth.application.ports.input.JwtUseCase;
+import com.ms.auth.domain.model.CustomUserDetails;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -51,7 +50,7 @@ class AuthUseCaseImplTest {
 		String response = authUseCaseImpl.login(email, password);
 
 		assertThat(response).isNotNull();
-		assertEquals(mockToken, response);
+		assertThat(response).isEqualTo(mockToken);
 
 		verify(authenticationManager).authenticate(new UsernamePasswordAuthenticationToken(
 			email, password
@@ -91,7 +90,7 @@ class AuthUseCaseImplTest {
 		});
 
 		RuntimeException exception = assertThrows(RuntimeException.class, () -> authUseCaseImpl.login(email, password));
-		assertEquals("Error generating token", exception.getCause().getMessage());
+		assertThat(exception.getCause().getMessage()).isEqualTo("Error generating token");
 
 
 		verify(authenticationManager).authenticate(any(Authentication.class));

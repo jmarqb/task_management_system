@@ -1,6 +1,5 @@
 package com.ms.auth.infrastructure.adapters.input.rest.controller;
 
-import com.ms.auth.domain.model.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -23,6 +22,7 @@ import java.util.List;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.ms.auth.application.ports.input.JwtUseCase;
 import com.ms.auth.data.seed.TestDataInitializer;
+import com.ms.auth.domain.model.CustomUserDetails;
 import com.ms.auth.domain.model.Error;
 import com.ms.auth.infrastructure.adapters.input.rest.dtos.request.CreateRoleDto;
 import com.ms.auth.infrastructure.adapters.input.rest.dtos.request.RoleToUsersDto;
@@ -43,9 +43,7 @@ import static com.ms.auth.data.Data.createRoleUser;
 import static com.ms.auth.data.Data.createSearchBodyDto;
 import static com.ms.auth.data.Data.getRoleAdmin;
 import static com.ms.auth.data.Data.getRoleUser;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
@@ -115,19 +113,19 @@ public class RoleControllerE2ETest {
 		ResponseEntity<Error> response = client.postForEntity(createURI("/api/roles"), createRoleDto,
 			Error.class);
 
-		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-		assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType());
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+		assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
 
 		Error error = response.getBody();
 
-		assertNotNull(error);
+		assertThat(error).isNotNull();
 
-		assertEquals(HttpStatus.BAD_REQUEST.value(), error.getStatus());
-		assertEquals("Bad Request", error.getError());
-		assertEquals("Validation failed", error.getMessage());
-		assertEquals("name", error.getFieldErrors().getFirst().getField());
-		assertEquals("null", error.getFieldErrors().getFirst().getRejectedValue());
-		assertEquals("name is required", error.getFieldErrors().getFirst().getMessage());
+		assertThat(error.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+		assertThat(error.getError()).isEqualTo("Bad Request");
+		assertThat(error.getMessage()).isEqualTo("Validation failed");
+		assertThat(error.getFieldErrors().getFirst().getField()).isEqualTo("name");
+		assertThat(error.getFieldErrors().getFirst().getRejectedValue()).isEqualTo("null");
+		assertThat(error.getFieldErrors().getFirst().getMessage()).isEqualTo("name is required");
 
 	}
 
@@ -139,16 +137,16 @@ public class RoleControllerE2ETest {
 		ResponseEntity<PaginatedResponseDto> response = client.postForEntity(createURI("/api/roles/search"),
 			searchBodyDto, PaginatedResponseDto.class);
 
-		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType());
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
 
 		PaginatedResponseDto body = response.getBody();
 
-		assertNotNull(body);
-		assertEquals(1, body.getData().size());
-		assertEquals(0, body.getPage());
-		assertEquals(10, body.getSize());
-		assertEquals(1, body.getTotal());
+		assertThat(body).isNotNull();
+		assertThat(body.getData().size()).isEqualTo(1);
+		assertThat(body.getPage()).isEqualTo(0);
+		assertThat(body.getSize()).isEqualTo(10);
+		assertThat(body.getTotal()).isEqualTo(1);
 	}
 
 	@Test
@@ -231,14 +229,14 @@ public class RoleControllerE2ETest {
 			DeleteResponseDto.class
 		);
 
-		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType());
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
 
 		DeleteResponseDto body = response.getBody();
 
-		assertNotNull(body);
-		assertEquals(1, body.getDeletedCount());
-		assertTrue(body.isAcknowledged());
+		assertThat(body).isNotNull();
+		assertThat(body.getDeletedCount()).isEqualTo(1);
+		assertThat(body.isAcknowledged()).isTrue();
 
 		ResponseEntity<Error> findRoleAfterDelete = client.getForEntity(
 			createURI("/api/roles/%d".formatted(3L)),
@@ -272,12 +270,12 @@ public class RoleControllerE2ETest {
 
 		PaginatedResponseDto body = response.getBody();
 
-		assertNotNull(body);
+		assertThat(body).isNotNull();
 		UserEntity user = userRepository.findByEmailWithRoles("testadmin@example.com").orElseThrow();
-		assertEquals(3, user.getRoles().size());
-		assertEquals(0, body.getPage());
-		assertEquals(1, body.getSize());
-		assertEquals(1, body.getTotal());
+		assertThat(user.getRoles().size()).isEqualTo(3);
+		assertThat(body.getPage()).isEqualTo(0);
+		assertThat(body.getSize()).isEqualTo(1);
+		assertThat(body.getTotal()).isEqualTo(1);
 	}
 
 	@Test
@@ -296,11 +294,11 @@ public class RoleControllerE2ETest {
 
 		Error body = response.getBody();
 
-		assertNotNull(body);
+		assertThat(body).isNotNull();
 
-		assertEquals(HttpStatus.BAD_REQUEST.value(), body.getStatus());
-		assertEquals("Duplicate Key", body.getError());
-		assertEquals("Could not execute statement: Duplicate key or Duplicate entry", body.getMessage());
+		assertThat(body.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+		assertThat(body.getError()).isEqualTo("Duplicate Key");
+		assertThat(body.getMessage()).isEqualTo("Could not execute statement: Duplicate key or Duplicate entry");
 	}
 
 	@Test
@@ -321,42 +319,42 @@ public class RoleControllerE2ETest {
 		);
 
 		PaginatedResponseDto body = response.getBody();
-		assertNotNull(body);
+		assertThat(body).isNotNull();
 
 		UserEntity user = userRepository.findByEmailWithRoles("testadmin@example.com").orElseThrow();
 
-		assertEquals(2, user.getRoles().size());
-		assertEquals(0, body.getPage());
-		assertEquals(1, body.getSize());
-		assertEquals(1, body.getTotal());
+		assertThat(user.getRoles().size()).isEqualTo(2);
+		assertThat(body.getPage()).isEqualTo(0);
+		assertThat(body.getSize()).isEqualTo(1);
+		assertThat(body.getTotal()).isEqualTo(1);
 	}
 
 	private void checkedResponseEntity(ResponseEntity<CreateRoleResponseDto> response, CreateRoleResponseDto expected,
-																		 HttpStatus status) {
-		assertEquals(status, response.getStatusCode());
-		assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType());
+																		HttpStatus status) {
+		assertThat(response.getStatusCode()).isEqualTo(status);
+		assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
 
 		CreateRoleResponseDto body = response.getBody();
-		assertNotNull(body);
-		assertEquals(expected.getName(), body.getName());
-		assertEquals(expected.getDescription(), body.getDescription());
-		assertEquals(expected.getIcon(), body.getIcon());
-		assertEquals(expected.isDeleted(), body.isDeleted());
-		assertEquals(expected.getDeletedAt(), body.getDeletedAt());
-		assertEquals(expected.getId(), body.getId());
+		assertThat(body).isNotNull();
+		assertThat(body.getName()).isEqualTo(expected.getName());
+		assertThat(body.getDescription()).isEqualTo(expected.getDescription());
+		assertThat(body.getIcon()).isEqualTo(expected.getIcon());
+		assertThat(body.isDeleted()).isEqualTo(expected.isDeleted());
+		assertThat(body.getDeletedAt()).isEqualTo(expected.getDeletedAt());
+		assertThat(body.getId()).isEqualTo(expected.getId());
 	}
 
 	public void checkedErrorResponseEntity(ResponseEntity<Error> response, HttpStatus status) {
-		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-		assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType());
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+		assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
 
 		Error body = response.getBody();
 
-		assertNotNull(body);
+		assertThat(body).isNotNull();
 
-		assertEquals(HttpStatus.NOT_FOUND.value(), body.getStatus());
-		assertEquals("NOT FOUND", body.getError());
-		assertEquals("The role does not exist", body.getMessage());
+		assertThat(body.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
+		assertThat(body.getError()).isEqualTo("NOT FOUND");
+		assertThat(body.getMessage()).isEqualTo("The role does not exist");
 	}
 
 	private String createURI(String uri) {

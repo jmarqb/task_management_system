@@ -23,8 +23,7 @@ import org.junit.jupiter.api.Test;
 import static com.ms.auth.data.Data.createUserDto;
 import static com.ms.auth.data.Data.createUserResponseDto;
 import static com.ms.auth.data.Data.getUserRole;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
@@ -55,22 +54,22 @@ class UserSignUpControllerE2ETest {
 		ResponseEntity<CreateUserResponseDto> response = client.postForEntity(createURI("/api/auth/signup"),
 			createUserDto, CreateUserResponseDto.class);
 
-		assertEquals(HttpStatus.CREATED, response.getStatusCode());
-		assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType());
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+		assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
 
 		CreateUserResponseDto body = response.getBody();
 
-		assertNotNull(body);
+		assertThat(body).isNotNull();
 
-		assertEquals(createUserResponseDto.getFirstName(), body.getFirstName());
-		assertEquals(createUserResponseDto.getLastName(), body.getLastName());
-		assertEquals(createUserResponseDto.getEmail(), body.getEmail());
-		assertEquals(createUserResponseDto.getId(), body.getId());
-		assertEquals(createUserResponseDto.getDeletedAt(), body.getDeletedAt());
-		assertEquals(createUserResponseDto.isDeleted(), body.isDeleted());
-		assertEquals(createUserResponseDto.getGender(), body.getGender());
-		assertEquals(createUserResponseDto.getCountry(), body.getCountry());
-		assertEquals(createUserResponseDto.getPhone(), body.getPhone());
+		assertThat(body.getFirstName()).isEqualTo(createUserResponseDto.getFirstName());
+		assertThat(body.getLastName()).isEqualTo(createUserResponseDto.getLastName());
+		assertThat(body.getEmail()).isEqualTo(createUserResponseDto.getEmail());
+		assertThat(body.getId()).isEqualTo(createUserResponseDto.getId());
+		assertThat(body.getDeletedAt()).isEqualTo(createUserResponseDto.getDeletedAt());
+		assertThat(body.isDeleted()).isEqualTo(createUserResponseDto.isDeleted());
+		assertThat(body.getGender()).isEqualTo(createUserResponseDto.getGender());
+		assertThat(body.getCountry()).isEqualTo(createUserResponseDto.getCountry());
+		assertThat(body.getPhone()).isEqualTo(createUserResponseDto.getPhone());
 
 	}
 
@@ -81,17 +80,17 @@ class UserSignUpControllerE2ETest {
 
 		ResponseEntity<Error> response = client.postForEntity(createURI("/api/auth/signup"),
 			createUserDto, Error.class);
-		assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType());
+		assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
 
 		Error error = response.getBody();
 
-		assertNotNull(error);
+		assertThat(error).isNotNull();
 
-		assertEquals(HttpStatus.BAD_REQUEST.value(), error.getStatus());
-		assertEquals("Bad Request", error.getError());
-		assertEquals("Validation failed", error.getMessage());
-		assertEquals("firstName", error.getFieldErrors().getFirst().getField());
-		assertEquals("null", error.getFieldErrors().getFirst().getRejectedValue());
+		assertThat(error.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+		assertThat(error.getError()).isEqualTo("Bad Request");
+		assertThat(error.getMessage()).isEqualTo("Validation failed");
+		assertThat(error.getFieldErrors().getFirst().getField()).isEqualTo("firstName");
+		assertThat(error.getFieldErrors().getFirst().getRejectedValue()).isEqualTo("null");
 	}
 
 	private String createURI(String uri) {

@@ -17,8 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ms.auth.application.ports.input.UserUseCase;
 import com.ms.auth.application.enums.Gender;
+import com.ms.auth.application.ports.input.UserUseCase;
 import com.ms.auth.domain.model.Role;
 import com.ms.auth.domain.model.User;
 import com.ms.auth.infrastructure.adapters.input.rest.advice.HandlerExceptionController;

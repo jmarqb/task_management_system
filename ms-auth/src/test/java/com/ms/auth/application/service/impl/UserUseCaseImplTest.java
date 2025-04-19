@@ -1,6 +1,5 @@
 package com.ms.auth.application.service.impl;
 
-import com.ms.auth.application.impl.UserUseCaseImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -14,6 +13,7 @@ import java.util.Optional;
 import com.ms.auth.application.exceptions.DuplicateKeyException;
 import com.ms.auth.application.exceptions.RoleNotFoundException;
 import com.ms.auth.application.exceptions.UserNotFoundException;
+import com.ms.auth.application.impl.UserUseCaseImpl;
 import com.ms.auth.domain.model.Role;
 import com.ms.auth.domain.model.User;
 import com.ms.auth.domain.ports.output.persistence.RolePersistencePort;
@@ -27,11 +27,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static com.ms.auth.data.Data.createRole;
 import static com.ms.auth.data.Data.createUser;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -60,12 +56,12 @@ class UserUseCaseImplTest {
 
 		User response = userUseCaseImpl.save(inputUser);
 
-		assertEquals(inputUser.getId(), response.getId());
-		assertEquals(inputUser.getFirstName(), response.getFirstName());
-		assertEquals(inputUser.getLastName(), response.getLastName());
-		assertEquals(inputUser.getEmail(), response.getEmail());
-		assertEquals(inputUser.getPhone(), response.getPhone());
-		assertEquals(inputUser.getRoles(), response.getRoles());
+		assertThat(response.getId()).isEqualTo(inputUser.getId());
+		assertThat(response.getFirstName()).isEqualTo(inputUser.getFirstName());
+		assertThat(response.getLastName()).isEqualTo(inputUser.getLastName());
+		assertThat(response.getEmail()).isEqualTo(inputUser.getEmail());
+		assertThat(response.getPhone()).isEqualTo(inputUser.getPhone());
+		assertThat(response.getRoles()).isEqualTo(inputUser.getRoles());
 
 		verify(rolePersistencePort).findByName("USER");
 		verify(userPersistencePort).save(inputUser);
@@ -82,7 +78,7 @@ class UserUseCaseImplTest {
 			() -> userUseCaseImpl.save(inputUser)
 		);
 
-		assertEquals("Default role ROLE_USER not found.", exception.getMessage());
+		assertThat(exception.getMessage()).isEqualTo("Default role ROLE_USER not found.");
 
 		verify(rolePersistencePort).findByName("USER");
 
@@ -148,7 +144,7 @@ class UserUseCaseImplTest {
 			() -> userUseCaseImpl.search(searchRegex, page, size, sort)
 		);
 
-		assertEquals("Database error", exception.getMessage());
+		assertThat(exception.getMessage()).isEqualTo("Database error");
 
 		verify(userPersistencePort).searchAllByRegex(searchRegex, pageable);
 	}
@@ -245,10 +241,10 @@ class UserUseCaseImplTest {
 		when(userPersistencePort.saveAll(users)).thenReturn(users);
 
 		List<User> response = userUseCaseImpl.addRoleToManyUsers(usersIds, role.getId());
-		assertNotNull(response);
-		assertEquals(2, response.size());
-		assertTrue(user1.getRoles().contains(role));
-		assertTrue(user2.getRoles().contains(role));
+		assertThat(response).isNotNull();
+		assertThat(response.size()).isEqualTo(2);
+		assertThat(user1.getRoles().contains(role)).isTrue();
+		assertThat(user2.getRoles().contains(role)).isTrue();
 
 		verify(rolePersistencePort).findByIdAndDeletedFalse(role.getId());
 		verify(userPersistencePort).findAllById(Arrays.asList(usersIds[0], usersIds[1]));
@@ -267,7 +263,7 @@ class UserUseCaseImplTest {
 			() -> userUseCaseImpl.addRoleToManyUsers(userIds, roleId)
 		);
 
-		assertEquals("The role does not exist", exception.getMessage());
+		assertThat(exception.getMessage()).isEqualTo("The role does not exist");
 
 		verify(rolePersistencePort).findByIdAndDeletedFalse(roleId);
 		verifyNoInteractions(userPersistencePort);
@@ -286,7 +282,7 @@ class UserUseCaseImplTest {
 			() -> userUseCaseImpl.addRoleToManyUsers(userIds, roleId)
 		);
 
-		assertEquals("The users do not exist", exception.getMessage());
+		assertThat(exception.getMessage()).isEqualTo("The users do not exist");
 
 		verify(rolePersistencePort).findByIdAndDeletedFalse(roleId);
 		verify(userPersistencePort).findAllById(Arrays.asList(userIds[0], userIds[1]));
@@ -311,7 +307,7 @@ class UserUseCaseImplTest {
 			() -> userUseCaseImpl.addRoleToManyUsers(userIds, role.getId())
 		);
 
-		assertEquals("The user already has this role", exception.getMessage());
+		assertThat(exception.getMessage()).isEqualTo("The user already has this role");
 
 		verify(rolePersistencePort).findByIdAndDeletedFalse(role.getId());
 		verify(userPersistencePort).findAllById(Arrays.asList(userIds[0], userIds[1]));
@@ -329,7 +325,7 @@ class UserUseCaseImplTest {
 			() -> userUseCaseImpl.removeRoleToManyUsers(userIds, roleId)
 		);
 
-		assertEquals("The role does not exist", exception.getMessage());
+		assertThat(exception.getMessage()).isEqualTo("The role does not exist");
 
 		verify(rolePersistencePort).findByIdAndDeletedFalse(roleId);
 		verifyNoInteractions(userPersistencePort);
@@ -348,7 +344,7 @@ class UserUseCaseImplTest {
 			() -> userUseCaseImpl.removeRoleToManyUsers(userIds, roleId)
 		);
 
-		assertEquals("The users do not exist", exception.getMessage());
+		assertThat(exception.getMessage()).isEqualTo("The users do not exist");
 
 		verify(rolePersistencePort).findByIdAndDeletedFalse(roleId);
 		verify(userPersistencePort).findAllById(Arrays.asList(userIds[0], userIds[1]));
@@ -370,10 +366,10 @@ class UserUseCaseImplTest {
 
 		List<User> response = userUseCaseImpl.removeRoleToManyUsers(userIds, role.getId());
 
-		assertNotNull(response);
-		assertEquals(2, response.size());
-		assertFalse(user1.getRoles().contains(role));
-		assertFalse(user2.getRoles().contains(role));
+		assertThat(response).isNotNull();
+		assertThat(response.size()).isEqualTo(2);
+		assertThat(user1.getRoles().contains(role)).isFalse();
+		assertThat(user2.getRoles().contains(role)).isFalse();
 
 		verify(rolePersistencePort).findByIdAndDeletedFalse(role.getId());
 		verify(userPersistencePort).findAllById(Arrays.asList(userIds[0], userIds[1]));
@@ -400,7 +396,7 @@ class UserUseCaseImplTest {
 			() -> userUseCaseImpl.removeRoleToManyUsers(userIds, role.getId())
 		);
 
-		assertEquals("Unexpected error", exception.getMessage());
+		assertThat(exception.getMessage()).isEqualTo("Unexpected error");
 
 		verify(rolePersistencePort).findByIdAndDeletedFalse(role.getId());
 		verify(userPersistencePort).findAllById(Arrays.asList(userIds[0], userIds[1]));
@@ -415,7 +411,7 @@ class UserUseCaseImplTest {
 
 		boolean result = userUseCaseImpl.existsByEmail(email);
 
-		assertTrue(result);
+		assertThat(result).isTrue();
 		verify(userPersistencePort).existsByEmail(email);
 	}
 
@@ -427,7 +423,7 @@ class UserUseCaseImplTest {
 
 		boolean result = userUseCaseImpl.existsByEmail(email);
 
-		assertFalse(result);
+		assertThat(result).isFalse();
 		verify(userPersistencePort).existsByEmail(email);
 	}
 
@@ -439,7 +435,7 @@ class UserUseCaseImplTest {
 
 		boolean result = userUseCaseImpl.existsByPhone(phone);
 
-		assertTrue(result);
+		assertThat(result).isTrue();
 		verify(userPersistencePort).existsByPhone(phone);
 	}
 
@@ -451,7 +447,7 @@ class UserUseCaseImplTest {
 
 		boolean result = userUseCaseImpl.existsByPhone(phone);
 
-		assertFalse(result);
+		assertThat(result).isFalse();
 		verify(userPersistencePort).existsByPhone(phone);
 	}
 
