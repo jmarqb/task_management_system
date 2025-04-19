@@ -1,0 +1,25 @@
+server:
+  port: 8888
+  servlet:
+    context-path: /config-server
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      server:
+        encrypt:
+          enabled: true
+        native:
+          search-locations: classpath:/config-repo
+  profiles:
+    active: native
+  threads:
+    virtual:
+      enabled: true
+logging:
+  level:
+    web: debug
+encrypt:
+  key: s3cr3t!!!
+
