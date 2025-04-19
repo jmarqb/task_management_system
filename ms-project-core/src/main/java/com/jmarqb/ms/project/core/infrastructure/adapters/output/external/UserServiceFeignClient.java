@@ -1,5 +1,6 @@
 package com.jmarqb.ms.project.core.infrastructure.adapters.output.external;
 
+import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,5 +16,5 @@ import com.jmarqb.ms.project.core.infrastructure.adapters.output.external.dtos.V
 public interface UserServiceFeignClient {
 
 	@PostMapping("/api/users/validate")
-	Set<UserDto> checkUsersIds(@RequestBody ValidateUsersDto validateUsersDto);
+	Set<UserDto> checkUsersIds(@Valid @RequestBody ValidateUsersDto validateUsersDto);
 }
