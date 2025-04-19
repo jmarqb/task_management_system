@@ -9,6 +9,7 @@ import com.ms.auth.infrastructure.adapters.input.rest.dtos.request.CreateUserDto
 import com.ms.auth.infrastructure.adapters.input.rest.dtos.request.UpdateUserDto;
 import com.ms.auth.infrastructure.adapters.input.rest.dtos.response.CreateUserResponseDto;
 import com.ms.auth.infrastructure.adapters.input.rest.dtos.response.PaginatedResponseDto;
+import com.ms.auth.infrastructure.adapters.input.rest.dtos.response.PartialUserResponseDto;
 import com.ms.auth.infrastructure.adapters.input.rest.dtos.response.UserRole;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -22,6 +23,8 @@ public interface UserMapper {
 
 	@Mapping(target = "id", ignore = false)
 	CreateUserResponseDto toResponse(User user);
+
+	PartialUserResponseDto toPartialResponse(User user);
 
 	@Mapping(target = "isAdmin", source = "admin")
 	@Mapping(target = "isDefaultRole", source = "defaultRole")
