@@ -49,7 +49,6 @@ import org.junit.jupiter.api.TestMethodOrder;
 import static com.jmarqb.ms.project.core.data.util.Util.projectUId;
 import static com.jmarqb.ms.project.core.data.util.Util.taskNotExist;
 import static com.jmarqb.ms.project.core.data.util.Util.taskUid;
-import static com.jmarqb.ms.project.core.data.util.Util.userId;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.instancio.Select.field;
 import static org.junit.jupiter.api.Assertions.assertEquals;
