@@ -86,6 +86,16 @@ cd task_management_system
 mvn clean install
 ```
 
+## Setup Notes (Windows/Linux)
+
+After cloning the project, make sure Git applies the correct line endings, especially if you're on Windows.
+
+Run this command to normalize line endings based on the `.gitattributes` configuration:
+
+```bash
+git add --renormalize .
+```
+
 **Build and run with Docker**:
 
 - **Modify the hosts file (if you're on Windows) with administrator privileges**: Before running docker-compose, you may
