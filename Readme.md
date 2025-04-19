@@ -149,18 +149,22 @@ You can access the API documentation at `localhost:8080/swagger-ui/index.html`.
 
 ### Swagger UI - Main Page
 ![img.png](./api_doc_img/principal.png)
+
 *Main landing page of the Swagger UI, listing all available microservices and endpoints.*
 
 ### User Signup Endpoint
 ![img.png](./api_doc_img/user_signup.png)
+
 *Example of the user registration endpoint where new users can be created.*
 
 ### User Login Endpoint
 ![img.png](./api_doc_img/user_login.png)
+
 *Login endpoint for user authentication and JWT token generation.*
 
 ### Ms-Project-Core Endpoints
 ![img.png](./api_doc_img/ms-project.png)
+
 *Endpoints exposed by the project and task management service.*
 
 For more detailed information about the endpoints, responses, and status codes, visit the API documentation.
