@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(ConfigServerExtension.class)
 @SpringBootTest(properties = {"spring.cloud.config.enabled=true",
-	"spring.config.import=configserver:http://localhost:" + CONFIG_PORT + "/config"})
+	"spring.config.import=configserver:http://localhost:" + CONFIG_PORT + "/config-server"})
 class ConfigServerIntegrationTest {
 
 	private @Value("${variable}") String variable;

@@ -1,6 +1,5 @@
 package com.ms.auth.application.impl;
 
-import com.ms.auth.domain.model.CustomUserDetails;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -12,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.ms.auth.application.ports.input.AuthUseCase;
 import com.ms.auth.application.ports.input.JwtUseCase;
+import com.ms.auth.domain.model.CustomUserDetails;
 
 @Component
 @RequiredArgsConstructor
@@ -29,7 +29,7 @@ public class AuthUseCaseImpl implements AuthUseCase {
 				Authentication authentication = authenticationManager.authenticate(
 					token
 				);
-				CustomUserDetails user = (CustomUserDetails ) authentication.getPrincipal();
+				CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
 
 				return jwtUseCase.generateToken(user);
 

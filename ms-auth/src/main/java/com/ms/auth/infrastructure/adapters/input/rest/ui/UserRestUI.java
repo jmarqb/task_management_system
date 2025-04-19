@@ -11,13 +11,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
+import java.util.Set;
 
 import com.ms.auth.infrastructure.adapters.input.rest.dtos.request.SearchBodyDto;
 import com.ms.auth.infrastructure.adapters.input.rest.dtos.request.UpdateUserDto;
+import com.ms.auth.infrastructure.adapters.input.rest.dtos.request.ValidateUsersDto;
 import com.ms.auth.infrastructure.adapters.input.rest.dtos.response.CreateUserResponseDto;
 import com.ms.auth.infrastructure.adapters.input.rest.dtos.response.DeleteResponseDto;
 import com.ms.auth.infrastructure.adapters.input.rest.dtos.response.OpenApiResponses;
 import com.ms.auth.infrastructure.adapters.input.rest.dtos.response.PaginatedResponseDto;
+import com.ms.auth.infrastructure.adapters.input.rest.dtos.response.PartialUserResponseDto;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -95,4 +98,19 @@ public interface UserRestUI {
 			examples = @ExampleObject(value = OpenApiResponses.UNAUTHORIZED_EXAMPLE
 			)))
 	ResponseEntity<DeleteResponseDto> removeUser(@PathVariable Long id);
+
+	@PostMapping("/validate")
+	@ApiResponse(responseCode = "200", description = "Users validated successfully")
+	@ApiResponse(responseCode = "400", description = "Bad request",
+		content = @Content(mediaType = "application/json",
+			schema = @Schema(implementation = Error.class),
+			examples = @ExampleObject(value = OpenApiResponses.BAD_REQUEST_EXAMPLE)))
+	@ApiResponse(
+		responseCode = "401",
+		description = "Unauthorized",
+		content = @Content(mediaType = "application/json",
+			schema = @Schema(implementation = Error.class),
+			examples = @ExampleObject(value = OpenApiResponses.UNAUTHORIZED_EXAMPLE
+			)))
+	Set<PartialUserResponseDto> validateUsers(@Valid @RequestBody ValidateUsersDto validateUsersDto);
 }

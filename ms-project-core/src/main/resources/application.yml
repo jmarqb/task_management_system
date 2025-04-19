@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: ms-project-core
+  config:
+    import:
+      - configserver:${CONFIG_SERVER_URI:http://localhost:8888/config-server/}
+

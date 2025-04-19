@@ -1,0 +1,98 @@
+version: '3.8'
+
+services:
+  config-server:
+    build:
+      context: ./config-server
+      dockerfile: Dockerfile
+    ports:
+      - "8888:8888"
+    restart: unless-stopped
+    networks:
+      - ms-projects-network
+
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - CONFIG_SERVER_URI=http://config-server:8888/config-server/
+      - MS_AUTH_URI=http://ms-auth:8081
+      - MS_PROJECT_CORE_URI=http://ms-project-core:8082
+    restart: unless-stopped
+    depends_on:
+      - config-server
+    networks:
+      - ms-projects-network
+
+
+  ms-auth:
+    build:
+      context: ./ms-auth
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      - DB_URL=jdbc:postgresql://postgres-service:5432/ms_api_authenticationDB
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - CONFIG_SERVER_URI=http://config-server:8888/config-server/
+      - JWT_SECRET=M1_S3CR3T_3NTR0P1A_T35T1N6PR0Y3CT_SECRET_KEY
+    restart: unless-stopped
+    depends_on:
+      postgres-service:
+        condition: service_healthy
+      config-server:
+        condition: service_started
+    networks:
+      - ms-projects-network
+
+
+  ms-project-core:
+    build:
+      context: ./ms-project-core
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8082"
+    environment:
+      - DB_URL=jdbc:postgresql://postgres-service:5432/ms_project_coreDB
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - CONFIG_SERVER_URI=http://config-server:8888/config-server/
+      - JWT_SECRET=M1_S3CR3T_3NTR0P1A_T35T1N6PR0Y3CT_SECRET_KEY
+      - API_GATEWAY_URI=http://api-gateway:8080
+    restart: unless-stopped
+    depends_on:
+      postgres-service:
+        condition: service_healthy
+      config-server:
+        condition: service_started
+    networks:
+      - ms-projects-network
+
+
+  postgres-service:
+    image: postgres:15.3
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+      - ./postgres-init:/docker-entrypoint-initdb.d
+    networks:
+      - ms-projects-network
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+networks:
+  ms-projects-network:
+    driver: bridge

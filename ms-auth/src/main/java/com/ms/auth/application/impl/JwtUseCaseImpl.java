@@ -1,7 +1,5 @@
 package com.ms.auth.application.impl;
 
-import com.ms.auth.domain.model.CustomUserDetails;
-import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,8 +12,10 @@ import java.util.Date;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ms.auth.application.ports.input.JwtUseCase;
+import com.ms.auth.domain.model.CustomUserDetails;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import javax.crypto.SecretKey;
 
 @Component

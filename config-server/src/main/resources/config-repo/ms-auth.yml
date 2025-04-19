@@ -1,31 +1,33 @@
 server:
   port: 8081
 spring:
-  # MySQL
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
     properties:
-      hibernate.dialect: org.hibernate.dialect.MySQLDialect
+      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
   threads:
     virtual:
       enabled: true
-  springdoc:
-    swagger-ui:
-      enabled: true
-      path: /swagger-ui.html
-    api-docs:
-      path: /v3/api-docs
-      enabled: true
-  logging:
-    level:
-      org:
-        springframework:
-          security:
-            web: DEBUG
+jwt:
+  private: ${JWT_SECRET}
+springdoc:
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+logging:
+  level:
+    org:
+      springframework:
+        security:
+          web: DEBUG
+

@@ -10,8 +10,8 @@ import java.util.List;
 
 import lombok.RequiredArgsConstructor;
 
-import com.ms.auth.application.ports.input.RoleUseCase;
 import com.ms.auth.application.exceptions.RoleNotFoundException;
+import com.ms.auth.application.ports.input.RoleUseCase;
 import com.ms.auth.domain.model.Role;
 import com.ms.auth.domain.ports.output.persistence.RolePersistencePort;
 
