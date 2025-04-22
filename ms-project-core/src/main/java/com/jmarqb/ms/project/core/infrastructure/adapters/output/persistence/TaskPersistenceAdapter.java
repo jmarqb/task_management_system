@@ -1,18 +1,19 @@
 package com.jmarqb.ms.project.core.infrastructure.adapters.output.persistence;
 
-import org.springframework.data.domain.Pageable;
+import com.jmarqb.ms.project.core.domain.model.Pagination;
+import com.jmarqb.ms.project.core.domain.model.Task;
+import com.jmarqb.ms.project.core.domain.ports.output.persistence.TaskPersistencePort;
+import com.jmarqb.ms.project.core.infrastructure.adapters.output.persistence.mapper.TaskPersistenceMapper;
+import com.jmarqb.ms.project.core.infrastructure.adapters.output.persistence.model.TaskEntity;
+import com.jmarqb.ms.project.core.infrastructure.adapters.output.persistence.repository.TaskRepository;
+import static com.jmarqb.ms.project.core.infrastructure.adapters.output.persistence.common.BuildPageable.buildPageable;
+
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
-
-import com.jmarqb.ms.project.core.domain.model.Task;
-import com.jmarqb.ms.project.core.domain.ports.output.persistence.TaskPersistencePort;
-import com.jmarqb.ms.project.core.infrastructure.adapters.output.persistence.mapper.TaskPersistenceMapper;
-import com.jmarqb.ms.project.core.infrastructure.adapters.output.persistence.model.TaskEntity;
-import com.jmarqb.ms.project.core.infrastructure.adapters.output.persistence.repository.TaskRepository;
 
 @Component
 @RequiredArgsConstructor
@@ -32,8 +33,8 @@ public class TaskPersistenceAdapter implements TaskPersistencePort {
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<Task> searchAll(Pageable pageable, Long userId) {
-		return this.taskPersistenceMapper.toTasksList(taskRepository.searchAll(pageable, userId));
+	public List<Task> searchAll(Pagination pagination, Long userId) {
+		return this.taskPersistenceMapper.toTasksList(taskRepository.searchAll(buildPageable(pagination), userId));
 	}
 
 	@Transactional(readOnly = true)
@@ -44,22 +45,23 @@ public class TaskPersistenceAdapter implements TaskPersistencePort {
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<Task> findByProjectUid(Pageable pageable, String projectUid) {
-		List<TaskEntity> taskEntities = taskRepository.findByProjectUid(pageable, projectUid);
+	public List<Task> findByProjectUid(Pagination pagination, String projectUid) {
+		List<TaskEntity> taskEntities = taskRepository.findByProjectUid(buildPageable(pagination), projectUid);
 		return taskPersistenceMapper.toTasksList(taskEntities);
 	}
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<Task> findByAssignedUserId(Pageable pageable, Long userId) {
-		List<TaskEntity> taskEntities = taskRepository.findByAssignedUserId(pageable, userId);
+	public List<Task> findByAssignedUserId(Pagination pagination, Long userId) {
+		List<TaskEntity> taskEntities = taskRepository.findByAssignedUserId(buildPageable(pagination), userId);
 		return taskPersistenceMapper.toTasksList(taskEntities);
 	}
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<Task> findByProjectUidAndAssignedUserIdPaginated(String projectUid, Long userId, Pageable pageable) {
-		List<TaskEntity> taskEntities = taskRepository.findByProjectUidAndAssignedUserIdPaginated(projectUid, userId, pageable);
+	public List<Task> findByProjectUidAndAssignedUserIdPaginated(String projectUid, Long userId, Pagination pagination) {
+		List<TaskEntity> taskEntities = taskRepository.findByProjectUidAndAssignedUserIdPaginated(projectUid, userId,
+			buildPageable(pagination));
 		return taskPersistenceMapper.toTasksList(taskEntities);
 	}
 
@@ -68,5 +70,6 @@ public class TaskPersistenceAdapter implements TaskPersistencePort {
 		List<TaskEntity> taskEntities = taskRepository.findByProjectUidAndAssignedUserId(projectUid, userId);
 		return taskPersistenceMapper.toTasksList(taskEntities);
 	}
+
 
 }
