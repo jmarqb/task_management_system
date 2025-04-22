@@ -1,4 +1,4 @@
-package com.ms.auth.application.service.impl;
+package com.ms.auth.infrastructure.security;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -6,9 +6,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.ms.auth.application.impl.AuthUseCaseImpl;
-import com.ms.auth.application.ports.input.JwtUseCase;
-import com.ms.auth.domain.model.CustomUserDetails;
+import com.ms.auth.infrastructure.security.model.CustomUserDetails;
+import com.ms.auth.infrastructure.security.service.AuthService;
+import com.ms.auth.infrastructure.security.service.JwtService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,11 +24,11 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class AuthUseCaseImplTest {
+class AuthServiceTest {
 
 	private @Mock AuthenticationManager authenticationManager;
-	private @Mock JwtUseCase jwtUseCase;
-	private @InjectMocks AuthUseCaseImpl authUseCaseImpl;
+	private @Mock JwtService jwtUseService;
+	private @InjectMocks AuthService authService;
 
 	@Test
 	void loginValidCredentials() throws JsonProcessingException {
@@ -45,9 +45,9 @@ class AuthUseCaseImplTest {
 		))).thenReturn(mockAuthentication);
 
 		String mockToken = "eyJhbGciOiJIUzI1NiJ9.mock.jwt.token";
-		when(jwtUseCase.generateToken(mockUser)).thenReturn(mockToken);
+		when(jwtUseService.generateToken(mockUser)).thenReturn(mockToken);
 
-		String response = authUseCaseImpl.login(email, password);
+		String response = authService.login(email, password);
 
 		assertThat(response).isNotNull();
 		assertThat(response).isEqualTo(mockToken);
@@ -55,7 +55,7 @@ class AuthUseCaseImplTest {
 		verify(authenticationManager).authenticate(new UsernamePasswordAuthenticationToken(
 			email, password
 		));
-		verify(jwtUseCase).generateToken(mockUser);
+		verify(jwtUseService).generateToken(mockUser);
 	}
 
 	@Test
@@ -66,10 +66,10 @@ class AuthUseCaseImplTest {
 		when(authenticationManager.authenticate(any(Authentication.class)))
 			.thenThrow(new BadCredentialsException("Invalid email or password"));
 
-		assertThatExceptionOfType(BadCredentialsException.class).isThrownBy(() -> authUseCaseImpl.login(email, password));
+		assertThatExceptionOfType(BadCredentialsException.class).isThrownBy(() -> authService.login(email, password));
 
 		verify(authenticationManager).authenticate(any(Authentication.class));
-		verifyNoInteractions(jwtUseCase);
+		verifyNoInteractions(jwtUseService);
 	}
 
 	@Test
@@ -86,15 +86,15 @@ class AuthUseCaseImplTest {
 			email, password
 		))).thenReturn(mockAuthentication);
 
-		when(jwtUseCase.generateToken(mockUser)).thenThrow(new JsonProcessingException("Error generating token") {
+		when(jwtUseService.generateToken(mockUser)).thenThrow(new JsonProcessingException("Error generating token") {
 		});
 
-		RuntimeException exception = assertThrows(RuntimeException.class, () -> authUseCaseImpl.login(email, password));
+		RuntimeException exception = assertThrows(RuntimeException.class, () -> authService.login(email, password));
 		assertThat(exception.getCause().getMessage()).isEqualTo("Error generating token");
 
 
 		verify(authenticationManager).authenticate(any(Authentication.class));
-		verify(jwtUseCase).generateToken(mockUser);
+		verify(jwtUseService).generateToken(mockUser);
 	}
 
 }
