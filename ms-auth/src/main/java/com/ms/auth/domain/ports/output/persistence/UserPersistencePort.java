@@ -1,11 +1,11 @@
 package com.ms.auth.domain.ports.output.persistence;
 
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
 
+import com.ms.auth.domain.model.Pagination;
 import com.ms.auth.domain.model.User;
 
 public interface UserPersistencePort {
@@ -22,9 +22,9 @@ public interface UserPersistencePort {
 
 	List<User> saveAll(List<User> users);
 
-	List<User> searchAll(Pageable pageable);
+	List<User> searchAll(Pagination pagination);
 
-	List<User> searchAllByRegex(String regex, Pageable pageable);
+	List<User> searchAllByRegex(String regex, Pagination pagination);
 
 	User findByIdAndDeletedFalse(Long id);
 
