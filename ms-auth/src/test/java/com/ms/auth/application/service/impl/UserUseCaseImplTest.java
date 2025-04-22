@@ -1,10 +1,5 @@
 package com.ms.auth.application.service.impl;
 
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -14,10 +9,13 @@ import com.ms.auth.application.exceptions.DuplicateKeyException;
 import com.ms.auth.application.exceptions.RoleNotFoundException;
 import com.ms.auth.application.exceptions.UserNotFoundException;
 import com.ms.auth.application.impl.UserUseCaseImpl;
+import com.ms.auth.application.mapper.UpdateFieldMapper;
+import com.ms.auth.domain.model.Pagination;
 import com.ms.auth.domain.model.Role;
 import com.ms.auth.domain.model.User;
 import com.ms.auth.domain.ports.output.persistence.RolePersistencePort;
 import com.ms.auth.domain.ports.output.persistence.UserPersistencePort;
+import com.ms.auth.domain.ports.output.security.PasswordEncoderProvider;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,6 +26,7 @@ import static com.ms.auth.data.Data.createRole;
 import static com.ms.auth.data.Data.createUser;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -40,9 +39,15 @@ class UserUseCaseImplTest {
 
 	private @Mock RolePersistencePort rolePersistencePort;
 
-	private @Mock PasswordEncoder passwordEncoder;
+	private @Mock PasswordEncoderProvider passwordEncoder;
+
+	private @Mock UpdateFieldMapper updateFieldMapper;
+
 
 	private @InjectMocks UserUseCaseImpl userUseCaseImpl;
+
+	private final Pagination pagination = new Pagination(0, 10, "ASC", "id");
+
 
 	@Test
 	void save() {
@@ -97,13 +102,13 @@ class UserUseCaseImplTest {
 		List<User> expectedUsers = List.of(inputUser);
 
 		when(userPersistencePort
-			.searchAllByRegex(searchRegex, PageRequest.of(page, size, Sort.Direction.ASC, "id")))
+			.searchAllByRegex(searchRegex, pagination))
 			.thenReturn(expectedUsers);
 
 		List<User> actualUsers = userUseCaseImpl.search(searchRegex, page, size, sort);
 
 		assertThat(actualUsers).isEqualTo(expectedUsers);
-		verify(userPersistencePort).searchAllByRegex(searchRegex, PageRequest.of(page, size, Sort.Direction.ASC, "id"));
+		verify(userPersistencePort).searchAllByRegex(searchRegex, pagination);
 	}
 
 	@Test
@@ -117,14 +122,14 @@ class UserUseCaseImplTest {
 		List<User> expectedUsers = List.of(inputUser);
 
 		when(userPersistencePort
-			.searchAll(PageRequest.of(page, size, Sort.Direction.ASC, "id")))
+			.searchAll(pagination))
 			.thenReturn(expectedUsers);
 
 		List<User> actualUsers = userUseCaseImpl.search(null, page, size, sort);
 
 
 		assertThat(actualUsers).isEqualTo(expectedUsers);
-		verify(userPersistencePort).searchAll(PageRequest.of(page, size, Sort.Direction.ASC, "id"));
+		verify(userPersistencePort).searchAll(pagination);
 	}
 
 	@Test
@@ -134,9 +139,7 @@ class UserUseCaseImplTest {
 		int size = 10;
 		String sort = "ASC";
 
-		Pageable pageable = PageRequest.of(page, size, Sort.Direction.ASC, "id");
-
-		when(userPersistencePort.searchAllByRegex(searchRegex, pageable))
+		when(userPersistencePort.searchAllByRegex(searchRegex, pagination))
 			.thenThrow(new RuntimeException("Database error"));
 
 		RuntimeException exception = assertThrows(
@@ -146,7 +149,7 @@ class UserUseCaseImplTest {
 
 		assertThat(exception.getMessage()).isEqualTo("Database error");
 
-		verify(userPersistencePort).searchAllByRegex(searchRegex, pageable);
+		verify(userPersistencePort).searchAllByRegex(searchRegex, pagination);
 	}
 
 	@Test
@@ -187,6 +190,8 @@ class UserUseCaseImplTest {
 
 		when(userPersistencePort.findByIdAndDeletedFalse(id))
 			.thenReturn(user);
+
+		doNothing().when(updateFieldMapper).updateUser(dataToUpdateUser, user);
 
 		when(userPersistencePort.save(user)).thenReturn(user);
 

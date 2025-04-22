@@ -1,12 +1,11 @@
 package com.ms.auth.application.service.impl;
 
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-
 import java.util.List;
 
 import com.ms.auth.application.exceptions.RoleNotFoundException;
 import com.ms.auth.application.impl.RoleUseCaseImpl;
+import com.ms.auth.application.mapper.UpdateFieldMapper;
+import com.ms.auth.domain.model.Pagination;
 import com.ms.auth.domain.model.Role;
 import com.ms.auth.domain.ports.output.persistence.RolePersistencePort;
 import org.instancio.Instancio;
@@ -19,6 +18,7 @@ import static com.ms.auth.data.Data.createRole;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -28,7 +28,11 @@ class RoleUseCaseImplTest {
 
 	private @Mock RolePersistencePort rolePersistencePort;
 
+	private @Mock UpdateFieldMapper updateFieldMapper;
+
 	private @InjectMocks RoleUseCaseImpl roleUseCaseImpl;
+
+	private final Pagination pagination = new Pagination(0, 10, "ASC", "id");
 
 	@Test
 	void save() {
@@ -62,13 +66,13 @@ class RoleUseCaseImplTest {
 		List<Role> expectedRoles = List.of(inputRole);
 
 		when(rolePersistencePort
-			.searchAllByRegex(searchRegex, PageRequest.of(page, size, Sort.Direction.ASC, "id")))
+			.searchAllByRegex(searchRegex, pagination))
 			.thenReturn(expectedRoles);
 
 		List<Role> actualRoles = roleUseCaseImpl.search(searchRegex, page, size, sort);
 
 		assertThat(actualRoles).isEqualTo(expectedRoles);
-		verify(rolePersistencePort).searchAllByRegex(searchRegex, PageRequest.of(page, size, Sort.Direction.ASC, "id"));
+		verify(rolePersistencePort).searchAllByRegex(searchRegex, pagination);
 	}
 
 	@Test
@@ -81,14 +85,14 @@ class RoleUseCaseImplTest {
 		List<Role> expectedRoles = List.of(inputRole);
 
 		when(rolePersistencePort
-			.searchAll(PageRequest.of(page, size, Sort.Direction.ASC, "id")))
+			.searchAll(pagination))
 			.thenReturn(expectedRoles);
 
 		List<Role> actualRoles = roleUseCaseImpl.search(null, page, size, sort);
 
 
 		assertThat(actualRoles).isEqualTo(expectedRoles);
-		verify(rolePersistencePort).searchAll(PageRequest.of(page, size, Sort.Direction.ASC, "id"));
+		verify(rolePersistencePort).searchAll(pagination);
 	}
 
 	@Test
@@ -130,6 +134,8 @@ class RoleUseCaseImplTest {
 
 		when(rolePersistencePort.findByIdAndDeletedFalse(id))
 			.thenReturn(role);
+
+		doNothing().when(updateFieldMapper).updateRole(dataToUpdateRole, role);
 
 		when(rolePersistencePort.save(role)).thenReturn(role);
 
