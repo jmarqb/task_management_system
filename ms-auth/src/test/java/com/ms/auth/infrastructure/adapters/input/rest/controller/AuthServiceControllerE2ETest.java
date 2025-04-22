@@ -16,14 +16,14 @@ import java.util.List;
 import java.util.Optional;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.ms.auth.application.ports.input.JwtUseCase;
 import com.ms.auth.data.seed.TestDataInitializer;
-import com.ms.auth.domain.model.CustomUserDetails;
 import com.ms.auth.infrastructure.adapters.input.rest.dtos.request.LoginDto;
 import com.ms.auth.infrastructure.adapters.input.rest.dtos.response.AuthResponseDto;
 import com.ms.auth.infrastructure.adapters.output.persistence.model.UserEntity;
 import com.ms.auth.infrastructure.adapters.output.persistence.repository.UserRepository;
 import com.ms.auth.infrastructure.security.config.SpringSecurityConfig;
+import com.ms.auth.infrastructure.security.model.CustomUserDetails;
+import com.ms.auth.infrastructure.security.service.JwtService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,7 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import({SpringSecurityConfig.class, TestDataInitializer.class})
-class AuthControllerE2ETest {
+class AuthServiceControllerE2ETest {
 
 	@Autowired
 	private TestRestTemplate client;
@@ -41,7 +41,7 @@ class AuthControllerE2ETest {
 	private UserRepository userRepository;
 
 	@Autowired
-	private JwtUseCase jwtUseCase;
+	private JwtService jwtService;
 
 	private String token;
 
@@ -70,7 +70,7 @@ class AuthControllerE2ETest {
 	}
 
 	protected String configureJwtToken(CustomUserDetails user) throws JsonProcessingException {
-		return jwtUseCase.generateToken(user);
+		return jwtService.generateToken(user);
 	}
 
 	@Test
@@ -81,7 +81,7 @@ class AuthControllerE2ETest {
 		ResponseEntity<AuthResponseDto> response = client.postForEntity(createURI("/api/auth/login"), loginDto, AuthResponseDto.class);
 
 		assertThat(response.getStatusCode().value()).isEqualTo(200);
-		assertThat(jwtUseCase.isTokenValid(response.getBody().getToken(), user.get())).isTrue();
+		assertThat(jwtService.isTokenValid(response.getBody().getToken(), user.get())).isTrue();
 	}
 
 	@Test

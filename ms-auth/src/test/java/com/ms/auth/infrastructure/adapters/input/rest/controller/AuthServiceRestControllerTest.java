@@ -11,9 +11,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ms.auth.application.ports.input.AuthUseCase;
 import com.ms.auth.infrastructure.adapters.input.rest.dtos.request.LoginDto;
 import com.ms.auth.infrastructure.security.config.SpringSecurityConfig;
+import com.ms.auth.infrastructure.security.service.AuthService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -24,21 +24,21 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @Import(SpringSecurityConfig.class)
-class AuthRestControllerTest {
+class AuthServiceRestControllerTest {
 
 	private MockMvc mockMvc;
 
-	private @Mock AuthUseCase authUseCase;
+	private @Mock AuthService authService;
 
 	@Test
 	void login() throws Exception {
-		mockMvc = MockMvcBuilders.standaloneSetup(new AuthRestController(authUseCase)).build();
+		mockMvc = MockMvcBuilders.standaloneSetup(new AuthRestController(authService)).build();
 		String mockToken = "eyJhbGciOiJIUzI1NiJ9.mock.jwt.token";
 
 		String email = "testuser@example.com";
 		String password = "testpassword";
 
-		when(authUseCase.login(email, password)).thenReturn(mockToken);
+		when(authService.login(email, password)).thenReturn(mockToken);
 
 
 		mockMvc.perform(post("/api/auth/login")
@@ -50,6 +50,6 @@ class AuthRestControllerTest {
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.token").value(mockToken));
 
-		verify(authUseCase).login(email, password);
+		verify(authService).login(email, password);
 	}
 }
