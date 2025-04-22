@@ -1,4 +1,4 @@
-package com.ms.auth.application.service.impl;
+package com.ms.auth.infrastructure.security;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.ms.auth.application.impl.JpaUserDetailsUseCaseImpl;
 import com.ms.auth.domain.model.User;
 import com.ms.auth.domain.ports.output.persistence.UserPersistencePort;
+import com.ms.auth.infrastructure.security.service.JpaUserDetails;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,9 +23,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class JpaUserDetailsUseCaseImplTest {
+class JpaUserDetailsTest {
 
-	private @InjectMocks JpaUserDetailsUseCaseImpl jpaUserDetailsUseCaseImpl;
+	private @InjectMocks JpaUserDetails jpaUserDetails;
 	private @Mock UserPersistencePort userPersistencePort;
 
 	@Test
@@ -46,7 +46,7 @@ class JpaUserDetailsUseCaseImplTest {
 
 		when(userPersistencePort.findByUsername(user.getEmail())).thenReturn(Optional.of(user));
 
-		org.springframework.security.core.userdetails.User actual = (org.springframework.security.core.userdetails.User) jpaUserDetailsUseCaseImpl.
+		org.springframework.security.core.userdetails.User actual = (org.springframework.security.core.userdetails.User) jpaUserDetails.
 			loadUserByUsername(user.getEmail());
 
 		assertThat(actual).isEqualTo(expected);
@@ -57,7 +57,7 @@ class JpaUserDetailsUseCaseImplTest {
 	void loadUserByUsername_UsernameNotFound() {
 		User user = createUser(1L);
 		when(userPersistencePort.findByUsername(user.getEmail())).thenReturn(Optional.empty());
-		assertThatExceptionOfType(UsernameNotFoundException.class).isThrownBy(() -> jpaUserDetailsUseCaseImpl.loadUserByUsername(user.getEmail()));
+		assertThatExceptionOfType(UsernameNotFoundException.class).isThrownBy(() -> jpaUserDetails.loadUserByUsername(user.getEmail()));
 		verify(userPersistencePort).findByUsername(user.getEmail());
 	}
 }
