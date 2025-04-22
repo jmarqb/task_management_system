@@ -1,4 +1,4 @@
-package com.ms.auth.application.service.impl;
+package com.ms.auth.infrastructure.security;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -9,8 +9,8 @@ import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.ms.auth.application.impl.JwtUseCaseImpl;
-import com.ms.auth.domain.model.CustomUserDetails;
+import com.ms.auth.infrastructure.security.model.CustomUserDetails;
+import com.ms.auth.infrastructure.security.service.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -22,9 +22,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-class JwtUseCaseImplTest {
+class JwtServiceTest {
 
-	private JwtUseCaseImpl jwtUseCase;
+	private JwtService jwtService;
 	private SecretKey returnedSecret;
 
 	private CustomUserDetails mockUser;
@@ -33,7 +33,7 @@ class JwtUseCaseImplTest {
 	void setUp() {
 		String TEST_SECRET = "mi_testing_secret_value_key_123_456_789";
 		returnedSecret = Keys.hmacShaKeyFor(TEST_SECRET.getBytes(StandardCharsets.UTF_8));
-		jwtUseCase = new JwtUseCaseImpl(TEST_SECRET);
+		jwtService = new JwtService(TEST_SECRET);
 
 		List<GrantedAuthority> roles = List.of(new SimpleGrantedAuthority("ROLE_USER"));
 		mockUser = new CustomUserDetails(
@@ -50,7 +50,7 @@ class JwtUseCaseImplTest {
 	@Test
 	void generateToken_ShouldReturnValidToken() throws JsonProcessingException {
 
-		String token = jwtUseCase.generateToken(mockUser);
+		String token = jwtService.generateToken(mockUser);
 		assertThat(token).isNotNull();
 		assertThat(token.isEmpty()).isFalse();
 
@@ -68,8 +68,8 @@ class JwtUseCaseImplTest {
 	void extractUsername_ShouldReturnCorrectUsername() throws JsonProcessingException {
 		CustomUserDetails user = mockUser;
 
-		String token = jwtUseCase.generateToken(user);
-		String extractedUsername = jwtUseCase.extractUsername(token);
+		String token = jwtService.generateToken(user);
+		String extractedUsername = jwtService.extractUsername(token);
 
 		assertThat(extractedUsername).isEqualTo("testUser");
 	}
@@ -78,9 +78,9 @@ class JwtUseCaseImplTest {
 	void isTokenValid_ShouldReturnTrueForValidToken() throws JsonProcessingException {
 		CustomUserDetails userDetails = mockUser;
 
-		String token = jwtUseCase.generateToken(userDetails);
+		String token = jwtService.generateToken(userDetails);
 
-		assertThat(jwtUseCase.isTokenValid(token, userDetails)).isTrue();
+		assertThat(jwtService.isTokenValid(token, userDetails)).isTrue();
 	}
 
 	@Test
@@ -96,17 +96,17 @@ class JwtUseCaseImplTest {
 			Collections.emptyList()
 		);
 
-		String token = jwtUseCase.generateToken(mockUser);
+		String token = jwtService.generateToken(mockUser);
 
-		assertThat(jwtUseCase.isTokenValid(token, otherUser)).isFalse();
+		assertThat(jwtService.isTokenValid(token, otherUser)).isFalse();
 	}
 
 	@Test
 	void isTokenExpired_ShouldReturnFalseForNewToken() throws JsonProcessingException {
 
-		String token = jwtUseCase.generateToken(mockUser);
+		String token = jwtService.generateToken(mockUser);
 
-		assertThat(jwtUseCase.isTokenExpired(token)).isFalse();
+		assertThat(jwtService.isTokenExpired(token)).isFalse();
 	}
 
 	@Test
@@ -118,6 +118,6 @@ class JwtUseCaseImplTest {
 			.signWith(returnedSecret)
 			.compact();
 
-		assertThat(jwtUseCase.isTokenExpired(expiredToken)).isTrue();
+		assertThat(jwtService.isTokenExpired(expiredToken)).isTrue();
 	}
 }
