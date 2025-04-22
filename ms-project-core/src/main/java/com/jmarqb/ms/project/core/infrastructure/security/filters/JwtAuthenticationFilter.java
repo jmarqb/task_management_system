@@ -1,5 +1,8 @@
 package com.jmarqb.ms.project.core.infrastructure.security.filters;
 
+import com.jmarqb.ms.project.core.infrastructure.security.CustomAuthenticationDetails;
+import com.jmarqb.ms.project.core.infrastructure.security.service.JwtService;
+
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -20,19 +23,17 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jmarqb.ms.project.core.application.ports.input.JwtUseCase;
-import com.jmarqb.ms.project.core.infrastructure.security.CustomAuthenticationDetails;
 import io.jsonwebtoken.Claims;
 
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-	private final JwtUseCase jwtUseCase;
+	private final JwtService jwtService;
 
-	public JwtAuthenticationFilter(JwtUseCase jwtService
+	public JwtAuthenticationFilter(JwtService jwtService
 	) {
-		this.jwtUseCase = jwtService;
+		this.jwtService = jwtService;
 	}
 
 	@Override
@@ -49,7 +50,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 			String token = header.replace(PREFIX_TOKEN, "");
 
-			Claims claims = jwtUseCase.extractAllClaims(token);
+			Claims claims = jwtService.extractAllClaims(token);
 			String username = claims.getSubject();
 			String rawAuthorities = claims.get("authorities", String.class);
 
@@ -63,7 +64,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				.collect(Collectors.toList());
 
 			if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-				if (jwtUseCase.isTokenValid(token, username)) {
+				if (jwtService.isTokenValid(token, username)) {
 					UsernamePasswordAuthenticationToken authenticationToken =
 						new UsernamePasswordAuthenticationToken(
 							username, null, authorities);
