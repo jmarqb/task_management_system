@@ -1,16 +1,5 @@
 package com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.controller;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
-
-import java.time.LocalDateTime;
-import java.util.List;
-
-import lombok.RequiredArgsConstructor;
-
 import com.jmarqb.ms.project.core.application.ports.input.TaskUseCase;
 import com.jmarqb.ms.project.core.domain.model.Task;
 import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.request.CreateTaskDto;
@@ -22,6 +11,17 @@ import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.respon
 import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.mapper.TaskMapper;
 import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.ui.TaskRestUI;
 import com.jmarqb.ms.project.core.infrastructure.security.CustomAuthenticationDetails;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequiredArgsConstructor

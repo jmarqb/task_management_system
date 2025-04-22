@@ -1,10 +1,11 @@
 package com.jmarqb.ms.project.core.application.impl;
 
-import java.util.UUID;
-
 import com.jmarqb.ms.project.core.application.exceptions.ProjectUserNotFoundException;
 import com.jmarqb.ms.project.core.domain.model.ProjectUser;
 import com.jmarqb.ms.project.core.domain.ports.output.persistence.ProjectUserPersistencePort;
+
+import java.util.UUID;
+
 import org.instancio.Instancio;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

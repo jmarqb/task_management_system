@@ -1,16 +1,5 @@
 package com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.controller;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
-
-import java.time.LocalDateTime;
-import java.util.List;
-
-import lombok.RequiredArgsConstructor;
-
 import com.jmarqb.ms.project.core.application.ports.input.ProjectUseCase;
 import com.jmarqb.ms.project.core.domain.model.Project;
 import com.jmarqb.ms.project.core.domain.ports.output.external.User;
@@ -27,6 +16,17 @@ import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.mapper.Task
 import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.ui.ProjectRestUI;
 import com.jmarqb.ms.project.core.infrastructure.adapters.output.external.dtos.ValidateUsersDto;
 import com.jmarqb.ms.project.core.infrastructure.security.CustomAuthenticationDetails;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequiredArgsConstructor

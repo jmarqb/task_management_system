@@ -1,5 +1,21 @@
 package com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.controller;
 
+import com.jmarqb.ms.project.core.application.vo.PriorityStatus;
+import com.jmarqb.ms.project.core.application.vo.TaskStatus;
+import com.jmarqb.ms.project.core.data.seed.TestDataInitializer;
+import com.jmarqb.ms.project.core.data.util.Util;
+import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.advice.Error;
+import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.request.CreateTaskDto;
+import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.request.PatchTaskDto;
+import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.request.SearchParamsDto;
+import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.response.DeleteResponseDto;
+import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.response.PaginatedResponseDto;
+import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.response.TaskResponseDto;
+import com.jmarqb.ms.project.core.infrastructure.security.config.SecurityConfig;
+import static com.jmarqb.ms.project.core.data.util.Util.projectUId;
+import static com.jmarqb.ms.project.core.data.util.Util.taskNotExist;
+import static com.jmarqb.ms.project.core.data.util.Util.taskUid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -24,18 +40,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jmarqb.ms.project.core.application.enums.PriorityStatus;
-import com.jmarqb.ms.project.core.application.enums.TaskStatus;
-import com.jmarqb.ms.project.core.data.seed.TestDataInitializer;
-import com.jmarqb.ms.project.core.data.util.Util;
-import com.jmarqb.ms.project.core.domain.model.Error;
-import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.request.CreateTaskDto;
-import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.request.PatchTaskDto;
-import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.request.SearchParamsDto;
-import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.response.DeleteResponseDto;
-import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.response.PaginatedResponseDto;
-import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.response.TaskResponseDto;
-import com.jmarqb.ms.project.core.infrastructure.security.config.SecurityConfig;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -46,14 +50,8 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import static com.jmarqb.ms.project.core.data.util.Util.projectUId;
-import static com.jmarqb.ms.project.core.data.util.Util.taskNotExist;
-import static com.jmarqb.ms.project.core.data.util.Util.taskUid;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.instancio.Select.field;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 @ActiveProfiles("test")
@@ -152,19 +150,19 @@ public class TaskControllerE2ETest {
 		ResponseEntity<Error> response = client.postForEntity(createURI("/api/v1/tasks"),
 			createTaskDto, Error.class);
 
-		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-		assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType());
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+		assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
 
 		Error error = response.getBody();
 
-		assertNotNull(error);
+		assertThat(error).isNotNull();
 
-		assertEquals(HttpStatus.BAD_REQUEST.value(), error.getStatus());
-		assertEquals("Bad Request", error.getError());
-		assertEquals("Validation failed", error.getMessage());
-		assertEquals("name", error.getFieldErrors().getFirst().getField());
-		assertEquals("null", error.getFieldErrors().getFirst().getRejectedValue());
-		assertNotNull(error.getFieldErrors().getFirst().getMessage());
+		assertThat(error.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+		assertThat(error.getError()).isEqualTo("Bad Request");
+		assertThat(error.getMessage()).isEqualTo("Validation failed");
+		assertThat(error.getFieldErrors().getFirst().getField()).isEqualTo("name");
+		assertThat(error.getFieldErrors().getFirst().getRejectedValue()).isEqualTo("null");
+		assertThat(error.getFieldErrors().getFirst().getMessage()).isNotNull();
 	}
 
 	@Test
@@ -186,15 +184,15 @@ public class TaskControllerE2ETest {
 			PaginatedResponseDto.class
 		);
 
-		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType());
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
 
 		PaginatedResponseDto body = response.getBody();
-		assertNotNull(body);
-		assertEquals(2, body.getData().size());
-		assertEquals(0, body.getPage());
-		assertEquals(20, body.getSize());
-		assertEquals(2, body.getTotal());
+		assertThat(body).isNotNull();
+		assertThat(body.getData().size()).isEqualTo(2);
+		assertThat(body.getPage()).isEqualTo(0);
+		assertThat(body.getSize()).isEqualTo(20);
+		assertThat(body.getTotal()).isEqualTo(2);
 	}
 
 	@Test
@@ -203,8 +201,8 @@ public class TaskControllerE2ETest {
 		responseTaskDto.setAssignedUserId(userId);
 		ResponseEntity<TaskResponseDto> response = client.getForEntity(createURI("/api/v1/tasks/" + taskUid),
 			TaskResponseDto.class);
-		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType());
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
 
 		checkedResponseEntity(response, responseTaskDto, HttpStatus.OK);
 	}
@@ -275,14 +273,14 @@ public class TaskControllerE2ETest {
 			DeleteResponseDto.class
 		);
 
-		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType());
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
 
 		DeleteResponseDto body = response.getBody();
 
-		assertNotNull(body);
-		assertEquals(1, body.getDeletedCount());
-		assertTrue(body.isAcknowledged());
+		assertThat(body).isNotNull();
+		assertThat(body.getDeletedCount()).isEqualTo(1);
+		assertThat(body.isAcknowledged()).isTrue();
 	}
 
 	@Test
@@ -299,26 +297,26 @@ public class TaskControllerE2ETest {
 	}
 
 	private void checkedResponseEntity(ResponseEntity<TaskResponseDto> response, TaskResponseDto expected,
-																		 HttpStatus status) {
-		assertEquals(status, response.getStatusCode());
-		assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType());
+																		HttpStatus status) {
+		assertThat(response.getStatusCode()).isEqualTo(status);
+		assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
 
 		TaskResponseDto body = response.getBody();
-		assertNotNull(body);
+		assertThat(body).isNotNull();
 		assertThat(expected).usingRecursiveComparison().ignoringFields("uid").isEqualTo(body);
 	}
 
 	public void checkedErrorResponseEntity(ResponseEntity<Error> response, String projectUid, HttpStatus status) {
-		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-		assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType());
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+		assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
 
 		Error body = response.getBody();
 
-		assertNotNull(body);
+		assertThat(body).isNotNull();
 
-		assertEquals(HttpStatus.NOT_FOUND.value(), body.getStatus());
-		assertEquals("NOT FOUND", body.getError());
-		assertEquals("Task with id " + projectUid + " not found", body.getMessage());
+		assertThat(body.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
+		assertThat(body.getError()).isEqualTo("NOT FOUND");
+		assertThat(body.getMessage()).isEqualTo("Task with id " + projectUid + " not found");
 	}
 
 

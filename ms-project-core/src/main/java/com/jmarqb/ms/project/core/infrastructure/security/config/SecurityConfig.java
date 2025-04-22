@@ -1,5 +1,7 @@
 package com.jmarqb.ms.project.core.infrastructure.security.config;
 
+import com.jmarqb.ms.project.core.infrastructure.security.filters.JwtAuthenticationFilter;
+
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,8 +23,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 import java.util.Arrays;
-
-import com.jmarqb.ms.project.core.infrastructure.security.filters.JwtAuthenticationFilter;
 
 @EnableWebSecurity
 @EnableMethodSecurity

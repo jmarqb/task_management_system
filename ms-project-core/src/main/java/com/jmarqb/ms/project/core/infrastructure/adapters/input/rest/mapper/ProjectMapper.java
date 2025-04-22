@@ -1,15 +1,16 @@
 package com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.mapper;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.jmarqb.ms.project.core.domain.model.Project;
 import com.jmarqb.ms.project.core.domain.ports.output.external.User;
 import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.request.CreateProjectDto;
 import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.request.PatchProjectDto;
 import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.response.PaginatedResponseDto;
 import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.response.ProjectResponseDto;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

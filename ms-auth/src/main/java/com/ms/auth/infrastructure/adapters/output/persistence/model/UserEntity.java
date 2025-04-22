@@ -11,14 +11,16 @@ import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
+import lombok.ToString.Exclude;
 
-import com.ms.auth.application.enums.Gender;
+import com.ms.auth.infrastructure.adapters.vo.Gender;
 
-@Data
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

@@ -1,5 +1,22 @@
 package com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.controller;
 
+import com.jmarqb.ms.project.core.data.seed.TestDataInitializer;
+import com.jmarqb.ms.project.core.data.util.Util;
+import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.advice.Error;
+import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.request.CreateProjectDto;
+import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.request.PatchProjectDto;
+import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.request.SearchParamsDto;
+import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.response.DeleteResponseDto;
+import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.response.PaginatedResponseDto;
+import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.response.ProjectResponseDto;
+import com.jmarqb.ms.project.core.infrastructure.adapters.output.external.UserServiceFeignClient;
+import com.jmarqb.ms.project.core.infrastructure.adapters.output.external.dtos.UserDto;
+import com.jmarqb.ms.project.core.infrastructure.adapters.output.external.dtos.ValidateUsersDto;
+import com.jmarqb.ms.project.core.infrastructure.security.config.SecurityConfig;
+import static com.jmarqb.ms.project.core.data.util.Util.projectNotExist;
+import static com.jmarqb.ms.project.core.data.util.Util.projectUId;
+import static com.jmarqb.ms.project.core.data.util.Util.userMemberId;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -30,19 +47,6 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jmarqb.ms.project.core.data.seed.TestDataInitializer;
-import com.jmarqb.ms.project.core.data.util.Util;
-import com.jmarqb.ms.project.core.domain.model.Error;
-import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.request.CreateProjectDto;
-import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.request.PatchProjectDto;
-import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.request.SearchParamsDto;
-import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.response.DeleteResponseDto;
-import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.response.PaginatedResponseDto;
-import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.response.ProjectResponseDto;
-import com.jmarqb.ms.project.core.infrastructure.adapters.output.external.UserServiceFeignClient;
-import com.jmarqb.ms.project.core.infrastructure.adapters.output.external.dtos.UserDto;
-import com.jmarqb.ms.project.core.infrastructure.adapters.output.external.dtos.ValidateUsersDto;
-import com.jmarqb.ms.project.core.infrastructure.security.config.SecurityConfig;
 import feign.FeignException;
 import feign.Request;
 import feign.Response;
@@ -56,14 +60,8 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import static com.jmarqb.ms.project.core.data.util.Util.projectNotExist;
-import static com.jmarqb.ms.project.core.data.util.Util.projectUId;
-import static com.jmarqb.ms.project.core.data.util.Util.userMemberId;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.instancio.Select.field;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -161,19 +159,19 @@ public class ProjectControllerE2ETest {
 		ResponseEntity<Error> response = client.postForEntity(createURI("/api/v1/projects"),
 			createProjectDto, Error.class);
 
-		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-		assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType());
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+		assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
 
 		Error error = response.getBody();
 
-		assertNotNull(error);
+		assertThat(error).isNotNull();
 
-		assertEquals(HttpStatus.BAD_REQUEST.value(), error.getStatus());
-		assertEquals("Bad Request", error.getError());
-		assertEquals("Validation failed", error.getMessage());
-		assertEquals("name", error.getFieldErrors().getFirst().getField());
-		assertEquals("null", error.getFieldErrors().getFirst().getRejectedValue());
-		assertNotNull(error.getFieldErrors().getFirst().getMessage());
+		assertThat(error.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+		assertThat(error.getError()).isEqualTo("Bad Request");
+		assertThat(error.getMessage()).isEqualTo("Validation failed");
+		assertThat(error.getFieldErrors().getFirst().getField()).isEqualTo("name");
+		assertThat(error.getFieldErrors().getFirst().getRejectedValue()).isEqualTo("null");
+		assertThat(error.getFieldErrors().getFirst().getMessage()).isNotNull();
 	}
 
 	@Test
@@ -195,15 +193,15 @@ public class ProjectControllerE2ETest {
 			PaginatedResponseDto.class
 		);
 
-		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType());
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
 
 		PaginatedResponseDto body = response.getBody();
-		assertNotNull(body);
-		assertEquals(2, body.getData().size());
-		assertEquals(0, body.getPage());
-		assertEquals(20, body.getSize());
-		assertEquals(2, body.getTotal());
+		assertThat(body).isNotNull();
+		assertThat(body.getData().size()).isEqualTo(2);
+		assertThat(body.getPage()).isEqualTo(0);
+		assertThat(body.getSize()).isEqualTo(20);
+		assertThat(body.getTotal()).isEqualTo(2);
 	}
 
 	@Test
@@ -211,15 +209,15 @@ public class ProjectControllerE2ETest {
 	void findProject() {
 		ResponseEntity<ProjectResponseDto> response = client.getForEntity(createURI("/api/v1/projects/" + projectUId),
 			ProjectResponseDto.class);
-		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType());
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
 
 		ProjectResponseDto body = response.getBody();
-		assertNotNull(body);
-		assertEquals(projectUId, body.getUid());
-		assertEquals("Test Project", body.getName());
-		assertEquals("Test Project Description", body.getDescription());
-		assertEquals(userId, body.getOwnerId());
+		assertThat(body).isNotNull();
+		assertThat(body.getUid()).isEqualTo(projectUId);
+		assertThat(body.getName()).isEqualTo("Test Project");
+		assertThat(body.getDescription()).isEqualTo("Test Project Description");
+		assertThat(body.getOwnerId()).isEqualTo(userId);
 	}
 
 	@Test
@@ -287,8 +285,8 @@ public class ProjectControllerE2ETest {
 		ResponseEntity<ProjectResponseDto> response = client.postForEntity(createURI("/api/v1/projects/"
 			+ projectUId + "/members"), dto, ProjectResponseDto.class);
 
-		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertNotNull(response.getBody());
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat(response.getBody()).isNotNull();
 	}
 
 	@Test
@@ -313,14 +311,14 @@ public class ProjectControllerE2ETest {
 		ResponseEntity<Error> response = client.postForEntity(createURI("/api/v1/projects/"
 			+ projectUId + "/members"), dto, Error.class);
 
-		assertEquals(HttpStatus.BAD_GATEWAY, response.getStatusCode());
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_GATEWAY);
 
 		Error error = response.getBody();
 
-		assertNotNull(error);
-		assertEquals(HttpStatus.BAD_GATEWAY.value(), error.getStatus());
-		assertEquals("Bad Gateway", error.getError());
-		assertEquals("Unknown error from external service", error.getMessage());
+		assertThat(error).isNotNull();
+		assertThat(error.getStatus()).isEqualTo(HttpStatus.BAD_GATEWAY.value());
+		assertThat(error.getError()).isEqualTo("Bad Gateway");
+		assertThat(error.getMessage()).isEqualTo("Unknown error from external service");
 	}
 
 	@Test
@@ -333,8 +331,8 @@ public class ProjectControllerE2ETest {
 			ProjectResponseDto.class
 		);
 
-		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertNotNull(response.getBody());
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat(response.getBody()).isNotNull();
 
 	}
 
@@ -348,14 +346,14 @@ public class ProjectControllerE2ETest {
 			DeleteResponseDto.class
 		);
 
-		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType());
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
 
 		DeleteResponseDto body = response.getBody();
 
-		assertNotNull(body);
-		assertEquals(1, body.getDeletedCount());
-		assertTrue(body.isAcknowledged());
+		assertThat(body).isNotNull();
+		assertThat(body.getDeletedCount()).isEqualTo(1);
+		assertThat(body.isAcknowledged()).isTrue();
 	}
 
 	@Test
@@ -382,33 +380,33 @@ public class ProjectControllerE2ETest {
 		ResponseEntity<Error> response = client.postForEntity(createURI("/api/v1/projects/" + projectUId +
 			"/members"), dto, Error.class);
 
-		assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-		assertNotNull(response.getBody());
-		assertEquals("Unauthorized", response.getBody().getError());
-		assertEquals("Unauthorized", response.getBody().getMessage());
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+		assertThat(response.getBody()).isNotNull();
+		assertThat(response.getBody().getError()).isEqualTo("Unauthorized");
+		assertThat(response.getBody().getMessage()).isEqualTo("Unauthorized");
 	}
 
 	private void checkedResponseEntity(ResponseEntity<ProjectResponseDto> response, ProjectResponseDto expected,
-																		 HttpStatus status) {
-		assertEquals(status, response.getStatusCode());
-		assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType());
+																		HttpStatus status) {
+		assertThat(response.getStatusCode()).isEqualTo(status);
+		assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
 
 		ProjectResponseDto body = response.getBody();
-		assertNotNull(body);
+		assertThat(body).isNotNull();
 		assertThat(expected).usingRecursiveComparison().ignoringFields("uid").isEqualTo(body);
 	}
 
 	public void checkedErrorResponseEntity(ResponseEntity<Error> response, String projectUid, HttpStatus status) {
-		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-		assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType());
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+		assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
 
 		Error body = response.getBody();
 
-		assertNotNull(body);
+		assertThat(body).isNotNull();
 
-		assertEquals(HttpStatus.NOT_FOUND.value(), body.getStatus());
-		assertEquals("NOT FOUND", body.getError());
-		assertEquals("Project with id " + projectUid + " not found", body.getMessage());
+		assertThat(body.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
+		assertThat(body.getError()).isEqualTo("NOT FOUND");
+		assertThat(body.getMessage()).isEqualTo("Project with id " + projectUid + " not found");
 	}
 
 	private String createURI(String uri) {

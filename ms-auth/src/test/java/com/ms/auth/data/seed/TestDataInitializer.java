@@ -9,11 +9,11 @@ import java.util.ArrayList;
 
 import lombok.Getter;
 
-import com.ms.auth.application.enums.Gender;
 import com.ms.auth.infrastructure.adapters.output.persistence.model.RoleEntity;
 import com.ms.auth.infrastructure.adapters.output.persistence.model.UserEntity;
 import com.ms.auth.infrastructure.adapters.output.persistence.repository.RoleRepository;
 import com.ms.auth.infrastructure.adapters.output.persistence.repository.UserRepository;
+import com.ms.auth.infrastructure.adapters.vo.Gender;
 
 @Component
 @Profile("test")

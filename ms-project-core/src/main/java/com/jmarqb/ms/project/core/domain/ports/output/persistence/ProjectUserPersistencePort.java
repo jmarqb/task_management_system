@@ -1,8 +1,8 @@
 package com.jmarqb.ms.project.core.domain.ports.output.persistence;
 
-import java.util.List;
-
 import com.jmarqb.ms.project.core.domain.model.ProjectUser;
+
+import java.util.List;
 
 public interface ProjectUserPersistencePort {
 	ProjectUser save(ProjectUser projectUser);

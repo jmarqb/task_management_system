@@ -1,5 +1,17 @@
 package com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.controller;
 
+import com.jmarqb.ms.project.core.application.ports.input.TaskUseCase;
+import com.jmarqb.ms.project.core.domain.model.Project;
+import com.jmarqb.ms.project.core.domain.model.Task;
+import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.request.CreateTaskDto;
+import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.request.PatchTaskDto;
+import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.request.SearchParamsDto;
+import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.response.DeleteResponseDto;
+import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.response.PaginatedResponseDto;
+import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.response.TaskResponseDto;
+import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.mapper.TaskMapper;
+import com.jmarqb.ms.project.core.infrastructure.security.CustomAuthenticationDetails;
+
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -19,17 +31,6 @@ import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jmarqb.ms.project.core.application.ports.input.TaskUseCase;
-import com.jmarqb.ms.project.core.domain.model.Project;
-import com.jmarqb.ms.project.core.domain.model.Task;
-import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.request.CreateTaskDto;
-import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.request.PatchTaskDto;
-import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.request.SearchParamsDto;
-import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.response.DeleteResponseDto;
-import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.response.PaginatedResponseDto;
-import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.response.TaskResponseDto;
-import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.mapper.TaskMapper;
-import com.jmarqb.ms.project.core.infrastructure.security.CustomAuthenticationDetails;
 import io.jsonwebtoken.Claims;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
