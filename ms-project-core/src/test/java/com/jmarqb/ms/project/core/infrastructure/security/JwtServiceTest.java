@@ -1,7 +1,7 @@
-package com.jmarqb.ms.project.core.application.impl;
+package com.jmarqb.ms.project.core.infrastructure.security;
 
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
+import com.jmarqb.ms.project.core.infrastructure.security.service.JwtService;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -17,14 +17,14 @@ import io.jsonwebtoken.security.Keys;
 import javax.crypto.SecretKey;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(MockitoExtension.class)
-class JwtUseCaseImplTest {
+class JwtServiceTest {
 
-	private JwtUseCaseImpl jwtUseCase;
+	private JwtService jwtService;
 
 	private SecretKey returnedSecret;
 
@@ -36,7 +36,7 @@ class JwtUseCaseImplTest {
 	void setUp() throws JsonProcessingException {
 		String TEST_SECRET = "mi_testing_secret_value_key_123_456_789";
 		returnedSecret = Keys.hmacShaKeyFor(TEST_SECRET.getBytes(StandardCharsets.UTF_8));
-		jwtUseCase = new JwtUseCaseImpl(TEST_SECRET);
+		jwtService = new JwtService(TEST_SECRET);
 
 		List<GrantedAuthority> roles = List.of(new SimpleGrantedAuthority("ROLE_USER"));
 
@@ -63,21 +63,21 @@ class JwtUseCaseImplTest {
 
 	@Test
 	void extractAllClaims() {
-		Claims returnedClaims = jwtUseCase.extractAllClaims(mockToken);
+		Claims returnedClaims = jwtService.extractAllClaims(mockToken);
 
-		assertNotNull(returnedClaims);
-		assertEquals(returnedClaims, jwtUseCase.extractAllClaims(mockToken));
+		assertThat(returnedClaims).isNotNull();
+		assertThat(jwtService.extractAllClaims(mockToken)).isEqualTo(returnedClaims);
 	}
 
 	@Test
 	void isTokenValid() {
-		Claims returnedClaims = jwtUseCase.extractAllClaims(mockToken);
-		assertThat(jwtUseCase.isTokenValid(mockToken, returnedClaims.getSubject())).isTrue();
+		Claims returnedClaims = jwtService.extractAllClaims(mockToken);
+		assertThat(jwtService.isTokenValid(mockToken, returnedClaims.getSubject())).isTrue();
 	}
 
 	@Test
 	void isTokenValid_ShouldReturnFalseForInvalidUsername() throws JsonProcessingException {
-		assertThat(jwtUseCase.isTokenValid(mockToken, "otherUser")).isFalse();
+		assertThat(jwtService.isTokenValid(mockToken, "otherUser")).isFalse();
 	}
 
 	@Test
@@ -89,6 +89,6 @@ class JwtUseCaseImplTest {
 			.signWith(returnedSecret)
 			.compact();
 
-		assertThat(jwtUseCase.isTokenExpired(expiredToken)).isTrue();
+		assertThat(jwtService.isTokenExpired(expiredToken)).isTrue();
 	}
 }

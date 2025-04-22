@@ -1,22 +1,21 @@
 package com.jmarqb.ms.project.core.application.impl;
 
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-
-import java.util.List;
-import java.util.UUID;
-
-import com.jmarqb.ms.project.core.application.enums.ProjectUserRole;
 import com.jmarqb.ms.project.core.application.exceptions.InvalidProjectForUserException;
 import com.jmarqb.ms.project.core.application.exceptions.TaskNotFoundException;
 import com.jmarqb.ms.project.core.application.exceptions.UnauthorizedTaskAccessException;
+import com.jmarqb.ms.project.core.application.mapper.UpdateFieldMapper;
 import com.jmarqb.ms.project.core.application.ports.input.ProjectUseCase;
 import com.jmarqb.ms.project.core.application.ports.input.ProjectUserUseCase;
+import com.jmarqb.ms.project.core.application.vo.ProjectUserRole;
+import com.jmarqb.ms.project.core.domain.model.Pagination;
 import com.jmarqb.ms.project.core.domain.model.ProjectUser;
 import com.jmarqb.ms.project.core.domain.model.Task;
 import com.jmarqb.ms.project.core.domain.ports.output.persistence.ProjectUserPersistencePort;
 import com.jmarqb.ms.project.core.domain.ports.output.persistence.TaskPersistencePort;
+
+import java.util.List;
+import java.util.UUID;
+
 import org.instancio.Instancio;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -44,6 +44,10 @@ class TaskUseCaseImplTest {
 
 	@Mock
 	private ProjectUseCase projectUseCase;
+
+	@Mock
+	private UpdateFieldMapper updateFieldMapper;
+
 
 	@InjectMocks
 	private TaskUseCaseImpl taskUseCase;
@@ -105,10 +109,10 @@ class TaskUseCaseImplTest {
 
 	@Test
 	void searchAll() {
-		Pageable pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
+		Pagination pagination = new Pagination(0, 10, "asc", "id");
 		List<Task> expected = List.of(Instancio.create(Task.class));
 
-		when(taskPersistencePort.searchAll(eq(pageable), eq(1L))).thenReturn(expected);
+		when(taskPersistencePort.searchAll(eq(pagination), eq(1L))).thenReturn(expected);
 
 		List<Task> result = taskUseCase.searchAll(0, 10, "asc", 1L);
 
@@ -117,11 +121,11 @@ class TaskUseCaseImplTest {
 
 	@Test
 	void searchAllByProjectUid() {
-		Pageable pageable = PageRequest.of(0, 10, Sort.Direction.DESC, "id");
+		Pagination pagination = new Pagination(0, 10, "desc", "id");
 		String projectUid = UUID.randomUUID().toString();
 		List<Task> expected = List.of(Instancio.create(Task.class));
 
-		when(taskPersistencePort.findByProjectUid(eq(pageable), eq(projectUid)))
+		when(taskPersistencePort.findByProjectUid(eq(pagination), eq(projectUid)))
 			.thenReturn(expected);
 
 		List<Task> result = taskUseCase.searchAllByProjectUid(projectUid, 0, 10, "desc");
@@ -133,13 +137,13 @@ class TaskUseCaseImplTest {
 	void searchAllByAssignedUserId() {
 		List<Task> expected = List.of(Instancio.create(Task.class));
 
-		when(taskPersistencePort.findByAssignedUserId(any(Pageable.class), eq(1L)))
+		when(taskPersistencePort.findByAssignedUserId(any(Pagination.class), eq(1L)))
 			.thenReturn(expected);
 
 		List<Task> result = taskUseCase.searchAllByAssignedUserId(1L, 0, 20, "asc");
 
 		assertThat(result).isEqualTo(expected);
-		verify(taskPersistencePort).findByAssignedUserId(any(Pageable.class), eq(1L));
+		verify(taskPersistencePort).findByAssignedUserId(any(Pagination.class), eq(1L));
 	}
 
 	@Test
@@ -147,7 +151,7 @@ class TaskUseCaseImplTest {
 		String projectUid = UUID.randomUUID().toString();
 		List<Task> expected = List.of(Instancio.create(Task.class));
 
-		when(taskPersistencePort.findByProjectUidAndAssignedUserIdPaginated(eq(projectUid), eq(1L), any(Pageable.class)))
+		when(taskPersistencePort.findByProjectUidAndAssignedUserIdPaginated(eq(projectUid), eq(1L), any(Pagination.class)))
 			.thenReturn(expected);
 
 		List<Task> result = taskUseCase.searchAllByProjectUidAndAssignedUserId(projectUid, 1L, 1, 5, "desc");
@@ -157,13 +161,14 @@ class TaskUseCaseImplTest {
 
 	@Test
 	void updateTask() {
+		String uid = UUID.randomUUID().toString();
 		Task task = Instancio.create(Task.class);
+		task.setUid(uid);
 		task.setAssignedUserId(1L);
 
 		Task updateData = new Task();
 		updateData.setUid(task.getUid());
-		updateData.setAssignedUserId(99L);
-		updateData.setName("Updated Task");
+
 
 		ProjectUser projectUser = Instancio.create(ProjectUser.class);
 		projectUser.setRole(ProjectUserRole.MEMBER.name());
@@ -172,11 +177,14 @@ class TaskUseCaseImplTest {
 		when(projectUserUseCase.findByProjectUidAndUserId(task.getProject().getUid(), 1L))
 			.thenReturn(projectUser);
 		when(projectUseCase.isArchived(task.getProject().getUid())).thenReturn(false);
+
+		doNothing().when(updateFieldMapper).updateTask(updateData, task);
+
 		when(taskPersistencePort.save(any(Task.class))).thenAnswer(i -> i.getArgument(0));
 
-		Task updated = taskUseCase.updateTask(updateData, 1L);
+		Task updated = taskUseCase.updateTask(updateData, task.getAssignedUserId());
 
-		assertThat(updated.getName()).isEqualTo("Updated Task");
+		assertThat(updated).isNotNull();
 		assertThat(updated.getAssignedUserId()).isEqualTo(1L);
 		verify(taskPersistencePort).save(task);
 	}

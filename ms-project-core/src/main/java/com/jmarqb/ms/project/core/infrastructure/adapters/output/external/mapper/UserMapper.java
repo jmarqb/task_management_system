@@ -1,9 +1,9 @@
 package com.jmarqb.ms.project.core.infrastructure.adapters.output.external.mapper;
 
-import org.springframework.stereotype.Component;
-
 import com.jmarqb.ms.project.core.domain.ports.output.external.User;
 import com.jmarqb.ms.project.core.infrastructure.adapters.output.external.dtos.UserDto;
+
+import org.springframework.stereotype.Component;
 
 @Component
 public class UserMapper {

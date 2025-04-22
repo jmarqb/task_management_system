@@ -1,9 +1,10 @@
 package com.jmarqb.ms.project.core.infrastructure.adapters.output.persistence.mapper;
 
-import java.util.List;
-
 import com.jmarqb.ms.project.core.domain.model.ProjectUser;
 import com.jmarqb.ms.project.core.infrastructure.adapters.output.persistence.model.ProjectUserEntity;
+
+import java.util.List;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

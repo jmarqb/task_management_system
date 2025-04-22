@@ -20,10 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.ms.auth.application.ports.input.JwtUseCase;
 import com.ms.auth.data.seed.TestDataInitializer;
-import com.ms.auth.domain.model.CustomUserDetails;
-import com.ms.auth.domain.model.Error;
+import com.ms.auth.infrastructure.adapters.input.rest.advice.Error;
 import com.ms.auth.infrastructure.adapters.input.rest.dtos.request.CreateRoleDto;
 import com.ms.auth.infrastructure.adapters.input.rest.dtos.request.RoleToUsersDto;
 import com.ms.auth.infrastructure.adapters.input.rest.dtos.request.SearchBodyDto;
@@ -34,6 +32,8 @@ import com.ms.auth.infrastructure.adapters.input.rest.dtos.response.PaginatedRes
 import com.ms.auth.infrastructure.adapters.output.persistence.model.UserEntity;
 import com.ms.auth.infrastructure.adapters.output.persistence.repository.UserRepository;
 import com.ms.auth.infrastructure.security.config.SpringSecurityConfig;
+import com.ms.auth.infrastructure.security.model.CustomUserDetails;
+import com.ms.auth.infrastructure.security.service.JwtService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -56,7 +56,7 @@ public class RoleControllerE2ETest {
 	private TestRestTemplate client;
 
 	@Autowired
-	private JwtUseCase jwtService;
+	private JwtService jwtService;
 
 	@Autowired
 	private UserRepository userRepository;

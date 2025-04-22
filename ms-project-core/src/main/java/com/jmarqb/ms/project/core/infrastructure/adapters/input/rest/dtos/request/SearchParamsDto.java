@@ -1,5 +1,8 @@
 package com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.request;
 
+import com.jmarqb.ms.project.core.application.vo.Sort;
+import com.jmarqb.ms.project.core.infrastructure.adapters.validation.ValueOfEnum;
+
 import jakarta.validation.constraints.Min;
 
 import lombok.AllArgsConstructor;
@@ -7,8 +10,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import com.jmarqb.ms.project.core.application.enums.Sort;
-import com.jmarqb.ms.project.core.infrastructure.adapters.validation.ValueOfEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Builder

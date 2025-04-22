@@ -1,5 +1,8 @@
 package com.jmarqb.ms.project.core.infrastructure.adapters.output.persistence.model;
 
+import com.jmarqb.ms.project.core.application.vo.PriorityStatus;
+import com.jmarqb.ms.project.core.application.vo.TaskStatus;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -20,8 +23,6 @@ import lombok.Setter;
 import lombok.ToString;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.jmarqb.ms.project.core.application.enums.PriorityStatus;
-import com.jmarqb.ms.project.core.application.enums.TaskStatus;
 
 @Getter
 @Setter

@@ -1,4 +1,4 @@
-package com.ms.auth.domain.model;
+package com.ms.auth.infrastructure.security.model;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;

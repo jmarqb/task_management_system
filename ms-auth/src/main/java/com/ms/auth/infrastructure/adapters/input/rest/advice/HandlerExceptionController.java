@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 import com.ms.auth.application.exceptions.DuplicateKeyException;
 import com.ms.auth.application.exceptions.RoleNotFoundException;
 import com.ms.auth.application.exceptions.UserNotFoundException;
-import com.ms.auth.domain.model.Error;
 
 @RestControllerAdvice
 public class HandlerExceptionController {

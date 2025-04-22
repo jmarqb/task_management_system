@@ -1,9 +1,5 @@
 package com.ms.auth.application.impl;
 
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -16,11 +12,14 @@ import lombok.RequiredArgsConstructor;
 
 import com.ms.auth.application.exceptions.RoleNotFoundException;
 import com.ms.auth.application.exceptions.UserNotFoundException;
+import com.ms.auth.application.mapper.UpdateFieldMapper;
 import com.ms.auth.application.ports.input.UserUseCase;
+import com.ms.auth.domain.model.Pagination;
 import com.ms.auth.domain.model.Role;
 import com.ms.auth.domain.model.User;
 import com.ms.auth.domain.ports.output.persistence.RolePersistencePort;
 import com.ms.auth.domain.ports.output.persistence.UserPersistencePort;
+import com.ms.auth.domain.ports.output.security.PasswordEncoderProvider;
 
 @Component
 @RequiredArgsConstructor
@@ -30,7 +29,9 @@ public class UserUseCaseImpl implements UserUseCase {
 
 	private final RolePersistencePort rolePersistencePort;
 
-	private final PasswordEncoder passwordEncoder;
+	private final PasswordEncoderProvider passwordEncoder;
+
+	private final UpdateFieldMapper updateFieldMapper;
 
 	@Override
 	public User save(User user) {
@@ -51,11 +52,10 @@ public class UserUseCaseImpl implements UserUseCase {
 	public List<User> search(String search, int page, int size, String sort) {
 		List<User> users;
 
-		Pageable pageable = PageRequest.of(page, size, "asc".equalsIgnoreCase(sort) ?
-			Sort.Direction.ASC : Sort.Direction.DESC, "id");
+		Pagination pagination = new Pagination(page, size, sort, "id");
 
-		users = search != null ? userPersistencePort.searchAllByRegex(search, pageable)
-			: userPersistencePort.searchAll(pageable);
+		users = search != null ? userPersistencePort.searchAllByRegex(search, pagination)
+			: userPersistencePort.searchAll(pagination);
 
 		return users;
 	}
@@ -68,7 +68,7 @@ public class UserUseCaseImpl implements UserUseCase {
 	@Override
 	public User updateUser(User dataToUpdateUser) {
 		User actualUser = existsUser(dataToUpdateUser.getId());
-		updateUserFields(actualUser, dataToUpdateUser);
+		updateFieldMapper.updateUser(dataToUpdateUser, actualUser);
 		return userPersistencePort.save(actualUser);
 	}
 
@@ -140,15 +140,5 @@ public class UserUseCaseImpl implements UserUseCase {
 			throw new UserNotFoundException("The user does not exist");
 		}
 		return user;
-	}
-
-	private void updateUserFields(User actualUser, User dataToUpdateUser) {
-		if (dataToUpdateUser.getFirstName() != null) actualUser.setFirstName(dataToUpdateUser.getFirstName());
-		if (dataToUpdateUser.getLastName() != null) actualUser.setLastName(dataToUpdateUser.getLastName());
-		if (dataToUpdateUser.getEmail() != null) actualUser.setEmail(dataToUpdateUser.getEmail());
-		if (dataToUpdateUser.getPhone() != null) actualUser.setPhone(dataToUpdateUser.getPhone());
-		if (dataToUpdateUser.getGender() != null) actualUser.setGender(dataToUpdateUser.getGender());
-		if (dataToUpdateUser.getCountry() != null) actualUser.setCountry(dataToUpdateUser.getCountry());
-
 	}
 }

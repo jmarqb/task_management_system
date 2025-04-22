@@ -1,7 +1,7 @@
 package com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.advice;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jmarqb.ms.project.core.application.exceptions.*;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -18,8 +18,8 @@ import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
-import com.jmarqb.ms.project.core.application.exceptions.*;
-import com.jmarqb.ms.project.core.domain.model.Error;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 
 @Slf4j
@@ -74,11 +74,11 @@ public class HandlerExceptionController {
 		}
 
 		Error response = Error.builder()
-				.timestamp(LocalDateTime.now())
-				.status(status.value())
-				.error(status.getReasonPhrase())
-				.message(message)
-				.build();
+			.timestamp(LocalDateTime.now())
+			.status(status.value())
+			.error(status.getReasonPhrase())
+			.message(message)
+			.build();
 
 		return ResponseEntity.status(status).body(response);
 	}

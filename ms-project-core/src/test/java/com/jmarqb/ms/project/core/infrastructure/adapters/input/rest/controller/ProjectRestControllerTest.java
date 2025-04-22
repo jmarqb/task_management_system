@@ -1,5 +1,22 @@
 package com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.controller;
 
+import com.jmarqb.ms.project.core.application.exceptions.InvalidProjectForUserException;
+import com.jmarqb.ms.project.core.application.exceptions.UnauthorizedProjectException;
+import com.jmarqb.ms.project.core.application.ports.input.ProjectUseCase;
+import com.jmarqb.ms.project.core.domain.model.Project;
+import com.jmarqb.ms.project.core.domain.ports.output.external.User;
+import com.jmarqb.ms.project.core.domain.ports.output.external.UserClient;
+import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.advice.Error;
+import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.advice.HandlerExceptionController;
+import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.request.CreateProjectDto;
+import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.request.PatchProjectDto;
+import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.request.SearchParamsDto;
+import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.response.PaginatedResponseDto;
+import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.response.ProjectResponseDto;
+import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.mapper.ProjectMapper;
+import com.jmarqb.ms.project.core.infrastructure.adapters.output.external.dtos.ValidateUsersDto;
+import com.jmarqb.ms.project.core.infrastructure.security.CustomAuthenticationDetails;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,24 +39,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jmarqb.ms.project.core.application.exceptions.InvalidProjectForUserException;
-import com.jmarqb.ms.project.core.application.exceptions.UnauthorizedProjectException;
-import com.jmarqb.ms.project.core.application.ports.input.ProjectUseCase;
-import com.jmarqb.ms.project.core.domain.model.Error;
-import com.jmarqb.ms.project.core.domain.model.Project;
-import com.jmarqb.ms.project.core.domain.ports.output.external.User;
-import com.jmarqb.ms.project.core.domain.ports.output.external.UserClient;
-import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.advice.HandlerExceptionController;
-import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.request.CreateProjectDto;
-import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.request.PatchProjectDto;
-import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.request.SearchParamsDto;
-import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.response.PaginatedResponseDto;
-import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.response.ProjectResponseDto;
-import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.mapper.ProjectMapper;
-import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.mapper.ProjectUserMapper;
-import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.mapper.TaskMapper;
-import com.jmarqb.ms.project.core.infrastructure.adapters.output.external.dtos.ValidateUsersDto;
-import com.jmarqb.ms.project.core.infrastructure.security.CustomAuthenticationDetails;
 import io.jsonwebtoken.Claims;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,9 +47,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.instancio.Select.field;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.anyInt;
@@ -263,11 +261,11 @@ class ProjectRestControllerTest {
 		ResponseEntity<Error> response = new HandlerExceptionController()
 			.handleUnauthorizedValidationException(exception);
 
-		assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-		assertNotNull(response.getBody());
-		assertEquals(401, response.getBody().getStatus());
-		assertEquals("Unauthorized", response.getBody().getError());
-		assertEquals("Unauthorized", response.getBody().getMessage());
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+		assertThat(response.getBody()).isNotNull();
+		assertThat(response.getBody().getStatus()).isEqualTo(401);
+		assertThat(response.getBody().getError()).isEqualTo("Unauthorized");
+		assertThat(response.getBody().getMessage()).isEqualTo("Unauthorized");
 	}
 
 	@Test
@@ -277,11 +275,11 @@ class ProjectRestControllerTest {
 		ResponseEntity<Error> response = new HandlerExceptionController()
 			.handleUnauthorizedExceptions(exception);
 
-		assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-		assertNotNull(response.getBody());
-		assertEquals(401, response.getBody().getStatus());
-		assertEquals("Unauthorized Access", response.getBody().getError());
-		assertEquals("You are not allowed", response.getBody().getMessage());
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+		assertThat(response.getBody()).isNotNull();
+		assertThat(response.getBody().getStatus()).isEqualTo(401);
+		assertThat(response.getBody().getError()).isEqualTo("Unauthorized Access");
+		assertThat(response.getBody().getMessage()).isEqualTo("You are not allowed");
 	}
 
 	@Test
@@ -291,11 +289,11 @@ class ProjectRestControllerTest {
 		ResponseEntity<Error> response = new HandlerExceptionController()
 			.handleInvalidProjectForUserException(exception);
 
-		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-		assertNotNull(response.getBody());
-		assertEquals(400, response.getBody().getStatus());
-		assertEquals("Invalid Project for User", response.getBody().getError());
-		assertEquals("Project is archived", response.getBody().getMessage());
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+		assertThat(response.getBody()).isNotNull();
+		assertThat(response.getBody().getStatus()).isEqualTo(400);
+		assertThat(response.getBody().getError()).isEqualTo("Invalid Project for User");
+		assertThat(response.getBody().getMessage()).isEqualTo("Project is archived");
 	}
 
 	@Test
@@ -305,10 +303,10 @@ class ProjectRestControllerTest {
 		ResponseEntity<Error> response = new HandlerExceptionController()
 			.handleValidationException(exception, null);
 
-		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-		assertNotNull(response.getBody());
-		assertEquals(400, response.getBody().getStatus());
-		assertEquals("Json Error", response.getBody().getError());
-		assertEquals("Malformed JSON", response.getBody().getMessage());
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+		assertThat(response.getBody()).isNotNull();
+		assertThat(response.getBody().getStatus()).isEqualTo(400);
+		assertThat(response.getBody().getError()).isEqualTo("Json Error");
+		assertThat(response.getBody().getMessage()).isEqualTo("Malformed JSON");
 	}
 }

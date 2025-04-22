@@ -12,18 +12,18 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import com.ms.auth.application.impl.JpaUserDetailsUseCaseImpl;
-import com.ms.auth.application.ports.input.JwtUseCase;
-import com.ms.auth.domain.model.CustomUserDetails;
+import com.ms.auth.infrastructure.security.model.CustomUserDetails;
+import com.ms.auth.infrastructure.security.service.JpaUserDetails;
+import com.ms.auth.infrastructure.security.service.JwtService;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-	private final JwtUseCase jwtUseCase;
-	private final JpaUserDetailsUseCaseImpl userDetailsService;
+	private final JwtService jwtService;
+	private final JpaUserDetails userDetailsService;
 
-	public JwtAuthenticationFilter(JwtUseCase jwtService, JpaUserDetailsUseCaseImpl userDetailsService) {
-		this.jwtUseCase = jwtService;
+	public JwtAuthenticationFilter(JwtService jwtService, JpaUserDetails userDetailsService) {
+		this.jwtService = jwtService;
 		this.userDetailsService = userDetailsService;
 	}
 
@@ -42,11 +42,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 			String token = header.replace(PREFIX_TOKEN, "");
 
-			String username = jwtUseCase.extractUsername(token);
+			String username = jwtService.extractUsername(token);
 
 			if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 				CustomUserDetails userDetails = userDetailsService.loadUserByUsername(username);
-				if (jwtUseCase.isTokenValid(token, userDetails)) {
+				if (jwtService.isTokenValid(token, userDetails)) {
 					UsernamePasswordAuthenticationToken authenticationToken =
 						new UsernamePasswordAuthenticationToken(
 							userDetails, null, userDetails.getAuthorities());

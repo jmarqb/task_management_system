@@ -1,4 +1,4 @@
-package com.jmarqb.ms.project.core.domain.model;
+package com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.advice;
 
 import java.time.LocalDateTime;
 import java.util.List;

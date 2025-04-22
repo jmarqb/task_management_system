@@ -1,13 +1,13 @@
 package com.jmarqb.ms.project.core.infrastructure.adapters.output.persistence.repository;
 
+import com.jmarqb.ms.project.core.domain.model.Task;
+import com.jmarqb.ms.project.core.infrastructure.adapters.output.persistence.model.TaskEntity;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
-
-import com.jmarqb.ms.project.core.domain.model.Task;
-import com.jmarqb.ms.project.core.infrastructure.adapters.output.persistence.model.TaskEntity;
 
 public interface TaskRepository extends JpaRepository<TaskEntity, String> {
 

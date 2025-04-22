@@ -1,17 +1,8 @@
 package com.jmarqb.ms.project.core.data.seed;
 
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
-import com.jmarqb.ms.project.core.application.enums.PriorityStatus;
-import com.jmarqb.ms.project.core.application.enums.ProjectUserRole;
-import com.jmarqb.ms.project.core.application.enums.TaskStatus;
+import com.jmarqb.ms.project.core.application.vo.PriorityStatus;
+import com.jmarqb.ms.project.core.application.vo.ProjectUserRole;
+import com.jmarqb.ms.project.core.application.vo.TaskStatus;
 import com.jmarqb.ms.project.core.infrastructure.adapters.output.persistence.model.ProjectEntity;
 import com.jmarqb.ms.project.core.infrastructure.adapters.output.persistence.model.ProjectUserEntity;
 import com.jmarqb.ms.project.core.infrastructure.adapters.output.persistence.model.TaskEntity;
@@ -21,6 +12,15 @@ import com.jmarqb.ms.project.core.infrastructure.adapters.output.persistence.rep
 import static com.jmarqb.ms.project.core.data.util.Util.projectUId;
 import static com.jmarqb.ms.project.core.data.util.Util.projectUserUId;
 import static com.jmarqb.ms.project.core.data.util.Util.taskUid;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Component
 @Profile("test")

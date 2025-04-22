@@ -1,4 +1,4 @@
-package com.ms.auth.application.enums;
+package com.ms.auth.infrastructure.adapters.vo;
 
 public enum Gender {
 	MALE,

@@ -1,27 +1,24 @@
-package com.ms.auth.application.impl;
+package com.ms.auth.infrastructure.security.service;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.ms.auth.application.ports.input.AuthUseCase;
-import com.ms.auth.application.ports.input.JwtUseCase;
-import com.ms.auth.domain.model.CustomUserDetails;
+import com.ms.auth.infrastructure.security.model.CustomUserDetails;
 
-@Component
+@Service
 @RequiredArgsConstructor
-public class AuthUseCaseImpl implements AuthUseCase {
+public class AuthService {
 
-	private final JwtUseCase jwtUseCase;
+	private final JwtService jwtService;
 
 	private final AuthenticationManager authenticationManager;
 
-	@Override
 	public String login(String email, String password) {
 		{
 			UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(email, password);
@@ -31,7 +28,7 @@ public class AuthUseCaseImpl implements AuthUseCase {
 				);
 				CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
 
-				return jwtUseCase.generateToken(user);
+				return jwtService.generateToken(user);
 
 			} catch (BadCredentialsException e) {
 				throw new BadCredentialsException("Invalid email or password", e);
