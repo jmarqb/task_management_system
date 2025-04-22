@@ -1,21 +1,22 @@
 package com.jmarqb.ms.project.core.application.impl;
 
-import org.springframework.data.domain.Pageable;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import com.jmarqb.ms.project.core.application.enums.ProjectUserRole;
 import com.jmarqb.ms.project.core.application.exceptions.InvalidProjectForUserException;
 import com.jmarqb.ms.project.core.application.exceptions.ProjectNotFoundException;
 import com.jmarqb.ms.project.core.application.exceptions.UnauthorizedProjectException;
 import com.jmarqb.ms.project.core.application.exceptions.UnauthorizedTaskAccessException;
+import com.jmarqb.ms.project.core.application.mapper.UpdateFieldMapper;
+import com.jmarqb.ms.project.core.application.vo.ProjectUserRole;
+import com.jmarqb.ms.project.core.domain.model.Pagination;
 import com.jmarqb.ms.project.core.domain.model.Project;
 import com.jmarqb.ms.project.core.domain.model.ProjectUser;
 import com.jmarqb.ms.project.core.domain.ports.output.persistence.ProjectPersistencePort;
 import com.jmarqb.ms.project.core.domain.ports.output.persistence.ProjectUserPersistencePort;
 import com.jmarqb.ms.project.core.domain.ports.output.persistence.TaskPersistencePort;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 import org.instancio.Instancio;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,13 +25,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -44,6 +43,8 @@ class ProjectUseCaseImplTest {
 	private ProjectUserPersistencePort projectUserPersistencePort;
 	@Mock
 	private TaskPersistencePort taskPersistencePort;
+
+	private @Mock UpdateFieldMapper updateFieldMapper;
 
 	@InjectMocks
 	private ProjectUseCaseImpl projectUseCase;
@@ -59,7 +60,7 @@ class ProjectUseCaseImplTest {
 
 		Project result = projectUseCase.save(project);
 
-		assertNotNull(result.getUid());
+		assertThat(result.getUid()).isNotNull();
 		verify(projectPersistencePort).save(result);
 		verify(projectUserPersistencePort).save(any(ProjectUser.class));
 	}
@@ -85,7 +86,7 @@ class ProjectUseCaseImplTest {
 	@Test
 	void searchAll() {
 		List<Project> expectedProjects = List.of(Instancio.create(Project.class));
-		when(projectPersistencePort.searchAll(any(Pageable.class), eq(1L))).thenReturn(expectedProjects);
+		when(projectPersistencePort.searchAll(any(Pagination.class), eq(1L))).thenReturn(expectedProjects);
 
 		List<Project> result = projectUseCase.searchAll(0, 10, "asc", 1L);
 		assertThat(result).isEqualTo(expectedProjects);
@@ -99,10 +100,15 @@ class ProjectUseCaseImplTest {
 		update.setOwnerId(existing.getOwnerId());
 
 		when(projectPersistencePort.findByUid(update.getUid())).thenReturn(existing);
+
+		doNothing().when(updateFieldMapper).updateProject(update, existing);
+
 		when(projectPersistencePort.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
 		Project result = projectUseCase.updateProject(update, existing.getOwnerId());
 		assertThat(result).isNotNull();
+		assertThat(result.getUid()).isEqualTo(existing.getUid());
+		assertThat(result.getOwnerId()).isEqualTo(existing.getOwnerId());
 		verify(projectPersistencePort).save(existing);
 	}
 
@@ -130,7 +136,7 @@ class ProjectUseCaseImplTest {
 		when(projectUserPersistencePort.saveAll(any())).thenAnswer(inv -> inv.getArgument(0));
 
 		Project result = projectUseCase.addMembersToProject(project.getUid(), List.of(100L, 101L), owner.getUserId());
-		assertNotNull(result.getMembers());
+		assertThat(result.getMembers()).isNotNull();
 	}
 
 	@Test
@@ -246,7 +252,7 @@ class ProjectUseCaseImplTest {
 
 		projectUseCase.deleteProject(project.getUid(), project.getOwnerId());
 		verify(projectPersistencePort).save(project);
-		assertTrue(project.isDeleted());
+		assertThat(project.isDeleted()).isTrue();
 	}
 
 	@Test
@@ -264,7 +270,7 @@ class ProjectUseCaseImplTest {
 		when(projectPersistencePort.findByUid(project.getUid())).thenReturn(project);
 
 		boolean archived = projectUseCase.isArchived(project.getUid());
-		assertEquals(project.isArchived(), archived);
+		assertThat(archived).isEqualTo(project.isArchived());
 	}
 
 }

@@ -1,8 +1,20 @@
 package com.jmarqb.ms.project.core.application.impl;
 
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import com.jmarqb.ms.project.core.application.exceptions.InvalidProjectForUserException;
+import com.jmarqb.ms.project.core.application.exceptions.ProjectNotFoundException;
+import com.jmarqb.ms.project.core.application.exceptions.UnauthorizedProjectException;
+import com.jmarqb.ms.project.core.application.exceptions.UnauthorizedTaskAccessException;
+import com.jmarqb.ms.project.core.application.mapper.UpdateFieldMapper;
+import com.jmarqb.ms.project.core.application.ports.input.ProjectUseCase;
+import com.jmarqb.ms.project.core.application.vo.ProjectUserRole;
+import com.jmarqb.ms.project.core.domain.model.Pagination;
+import com.jmarqb.ms.project.core.domain.model.Project;
+import com.jmarqb.ms.project.core.domain.model.ProjectUser;
+import com.jmarqb.ms.project.core.domain.model.Task;
+import com.jmarqb.ms.project.core.domain.ports.output.persistence.ProjectPersistencePort;
+import com.jmarqb.ms.project.core.domain.ports.output.persistence.ProjectUserPersistencePort;
+import com.jmarqb.ms.project.core.domain.ports.output.persistence.TaskPersistencePort;
+
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -14,19 +26,6 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import com.jmarqb.ms.project.core.application.enums.ProjectUserRole;
-import com.jmarqb.ms.project.core.application.exceptions.InvalidProjectForUserException;
-import com.jmarqb.ms.project.core.application.exceptions.ProjectNotFoundException;
-import com.jmarqb.ms.project.core.application.exceptions.UnauthorizedProjectException;
-import com.jmarqb.ms.project.core.application.exceptions.UnauthorizedTaskAccessException;
-import com.jmarqb.ms.project.core.application.ports.input.ProjectUseCase;
-import com.jmarqb.ms.project.core.domain.model.Project;
-import com.jmarqb.ms.project.core.domain.model.ProjectUser;
-import com.jmarqb.ms.project.core.domain.model.Task;
-import com.jmarqb.ms.project.core.domain.ports.output.persistence.ProjectPersistencePort;
-import com.jmarqb.ms.project.core.domain.ports.output.persistence.ProjectUserPersistencePort;
-import com.jmarqb.ms.project.core.domain.ports.output.persistence.TaskPersistencePort;
-
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -36,6 +35,8 @@ public class ProjectUseCaseImpl implements ProjectUseCase {
 
 	private final ProjectUserPersistencePort projectUserPersistencePort;
 	private final TaskPersistencePort taskPersistencePort;
+
+	private final UpdateFieldMapper updateFieldMapper;
 
 	@Override
 	public Project save(Project project) {
@@ -68,10 +69,9 @@ public class ProjectUseCaseImpl implements ProjectUseCase {
 	public List<Project> searchAll(int page, int size, String sort, Long userId) {
 		List<Project> projects;
 
-		Pageable pageable = PageRequest.of(page, size, "asc".equalsIgnoreCase(sort) ?
-			Sort.Direction.ASC : Sort.Direction.DESC, "id");
+		Pagination pagination = new Pagination(page, size, sort, "id");
 
-		projects = projectPersistencePort.searchAll(pageable, userId);
+		projects = projectPersistencePort.searchAll(pagination, userId);
 
 		return projects;
 	}
@@ -82,7 +82,7 @@ public class ProjectUseCaseImpl implements ProjectUseCase {
 		if (!Objects.equals(actualProject.getOwnerId(), userId)) {
 			throw new UnauthorizedProjectException("Only the project owner can update the project.");
 		}
-		updateProjectFields(actualProject, dataToUpdateProject);
+		updateFieldMapper.updateProject(dataToUpdateProject, actualProject);
 		return projectPersistencePort.save(actualProject);
 	}
 
@@ -168,13 +168,6 @@ public class ProjectUseCaseImpl implements ProjectUseCase {
 	public boolean isArchived(String uid) {
 		Project project = this.findProjectByUid(uid);
 		return project.isArchived();
-	}
-
-	private void updateProjectFields(Project actualProject, Project dataToUpdateProject) {
-		if (dataToUpdateProject.getName() != null) actualProject.setName(dataToUpdateProject.getName());
-		if (dataToUpdateProject.getDescription() != null)
-			actualProject.setDescription(dataToUpdateProject.getDescription());
-		if (dataToUpdateProject.isArchived()) actualProject.setArchived(true);
 	}
 
 	private ProjectUser validateProjectUser(String projectUid, Long userId) {
