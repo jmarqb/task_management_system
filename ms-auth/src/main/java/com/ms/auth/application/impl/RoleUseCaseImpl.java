@@ -1,8 +1,5 @@
 package com.ms.auth.application.impl;
 
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -11,7 +8,9 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 
 import com.ms.auth.application.exceptions.RoleNotFoundException;
+import com.ms.auth.application.mapper.UpdateFieldMapper;
 import com.ms.auth.application.ports.input.RoleUseCase;
+import com.ms.auth.domain.model.Pagination;
 import com.ms.auth.domain.model.Role;
 import com.ms.auth.domain.ports.output.persistence.RolePersistencePort;
 
@@ -20,6 +19,8 @@ import com.ms.auth.domain.ports.output.persistence.RolePersistencePort;
 public class RoleUseCaseImpl implements RoleUseCase {
 
 	private final RolePersistencePort rolePersistencePort;
+
+	private final UpdateFieldMapper updateFieldMapper;
 
 	@Override
 	public Role save(Role role) {
@@ -30,11 +31,10 @@ public class RoleUseCaseImpl implements RoleUseCase {
 	public List<Role> search(String search, int page, int size, String sort) {
 		List<Role> roles;
 
-		Pageable pageable = PageRequest.of(page, size, "asc".equalsIgnoreCase(sort) ?
-			Sort.Direction.ASC : Sort.Direction.DESC, "id");
+		Pagination pagination = new Pagination(page, size, sort, "id");
 
-		roles = search != null ? rolePersistencePort.searchAllByRegex(search, pageable)
-			: rolePersistencePort.searchAll(pageable);
+		roles = search != null ? rolePersistencePort.searchAllByRegex(search, pagination)
+			: rolePersistencePort.searchAll(pagination);
 
 		return roles;
 	}
@@ -47,7 +47,7 @@ public class RoleUseCaseImpl implements RoleUseCase {
 	@Override
 	public Role updateRole(Role dataToUpdateRole) {
 		Role actualRole = existsRole(dataToUpdateRole.getId());
-		updateRoleFields(actualRole, dataToUpdateRole);
+		updateFieldMapper.updateRole(dataToUpdateRole, actualRole);
 		return rolePersistencePort.save(actualRole);
 	}
 
@@ -65,13 +65,5 @@ public class RoleUseCaseImpl implements RoleUseCase {
 			throw new RoleNotFoundException("The role does not exist");
 		}
 		return role;
-	}
-
-	private void updateRoleFields(Role actualRole, Role dataToUpdateRole) {
-		if (dataToUpdateRole.getName() != null) actualRole.setName(dataToUpdateRole.getName());
-		if (dataToUpdateRole.getDescription() != null) actualRole.setDescription(dataToUpdateRole.getDescription());
-		if (dataToUpdateRole.getIcon() != null) actualRole.setIcon(dataToUpdateRole.getIcon());
-		if (dataToUpdateRole.isAdmin()) actualRole.setAdmin(true);
-		if (dataToUpdateRole.isDefaultRole()) actualRole.setDefaultRole(true);
 	}
 }
