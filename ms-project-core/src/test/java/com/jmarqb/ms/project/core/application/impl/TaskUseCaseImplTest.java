@@ -6,7 +6,9 @@ import com.jmarqb.ms.project.core.application.exceptions.UnauthorizedTaskAccessE
 import com.jmarqb.ms.project.core.application.mapper.UpdateFieldMapper;
 import com.jmarqb.ms.project.core.application.ports.input.ProjectUseCase;
 import com.jmarqb.ms.project.core.application.ports.input.ProjectUserUseCase;
+import com.jmarqb.ms.project.core.application.vo.PriorityStatus;
 import com.jmarqb.ms.project.core.application.vo.ProjectUserRole;
+import com.jmarqb.ms.project.core.application.vo.TaskStatus;
 import com.jmarqb.ms.project.core.domain.model.Pagination;
 import com.jmarqb.ms.project.core.domain.model.ProjectUser;
 import com.jmarqb.ms.project.core.domain.model.Task;
@@ -162,31 +164,42 @@ class TaskUseCaseImplTest {
 	@Test
 	void updateTask() {
 		String uid = UUID.randomUUID().toString();
-		Task task = Instancio.create(Task.class);
-		task.setUid(uid);
-		task.setAssignedUserId(1L);
+		Task updateData = Task.builder()
+				.uid(uid)
+				.priority(PriorityStatus.LOW.toString())
+				.status(TaskStatus.PENDING.toString())
+				.deleted(false)
+				.deletedAt(null)
+				.build();
 
-		Task updateData = new Task();
-		updateData.setUid(task.getUid());
+		Task existingTask = Instancio.create(Task.class);
+		existingTask.setUid(uid);
+		existingTask.setAssignedUserId(1L);
 
 
 		ProjectUser projectUser = Instancio.create(ProjectUser.class);
 		projectUser.setRole(ProjectUserRole.MEMBER.name());
+		projectUser.setProject(existingTask.getProject());
+		projectUser.setUserId(existingTask.getAssignedUserId());
 
-		when(taskPersistencePort.findByUid(task.getUid())).thenReturn(task);
-		when(projectUserUseCase.findByProjectUidAndUserId(task.getProject().getUid(), 1L))
+		when(taskPersistencePort.findByUid(existingTask.getUid())).thenReturn(existingTask);
+
+		when(projectUserUseCase.findByProjectUidAndUserId(projectUser.getProject().getUid(), existingTask.getAssignedUserId()))
 			.thenReturn(projectUser);
-		when(projectUseCase.isArchived(task.getProject().getUid())).thenReturn(false);
 
-		doNothing().when(updateFieldMapper).updateTask(updateData, task);
+		when(projectUseCase.isArchived(existingTask.getProject().getUid())).thenReturn(false);
+
+		doNothing().when(updateFieldMapper).updateTask(updateData, existingTask);
 
 		when(taskPersistencePort.save(any(Task.class))).thenAnswer(i -> i.getArgument(0));
 
-		Task updated = taskUseCase.updateTask(updateData, task.getAssignedUserId());
+		Task result = taskUseCase.updateTask(updateData, existingTask.getAssignedUserId());
 
-		assertThat(updated).isNotNull();
-		assertThat(updated.getAssignedUserId()).isEqualTo(1L);
-		verify(taskPersistencePort).save(task);
+		assertThat(result).isEqualTo(existingTask);
+		verify(taskPersistencePort).findByUid(existingTask.getUid());
+		verify(projectUserUseCase).findByProjectUidAndUserId(projectUser.getProject().getUid(), existingTask.getAssignedUserId());
+		verify(updateFieldMapper).updateTask(updateData, existingTask);
+		verify(taskPersistencePort).save(existingTask);
 	}
 
 	@Test
