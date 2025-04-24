@@ -94,12 +94,22 @@ class ProjectUseCaseImplTest {
 
 	@Test
 	void updateProject() {
-		Project existing = Instancio.create(Project.class);
-		Project update = Instancio.create(Project.class);
-		update.setUid(existing.getUid());
-		update.setOwnerId(existing.getOwnerId());
+		String uid = UUID.randomUUID().toString();
+		Project update = Project.builder()
+				.uid(uid)
+				.ownerId(1L)
+				.name("new name")
+				.deleted(false)
+				.deletedAt(null)
+				.description("new description")
+				.isArchived(false)
+				.build();
 
-		when(projectPersistencePort.findByUid(update.getUid())).thenReturn(existing);
+		Project existing = Instancio.create(Project.class);
+		existing.setUid(uid);
+		existing.setOwnerId(1L);
+
+		when(projectPersistencePort.findByUid(existing.getUid())).thenReturn(existing);
 
 		doNothing().when(updateFieldMapper).updateProject(update, existing);
 
@@ -107,8 +117,9 @@ class ProjectUseCaseImplTest {
 
 		Project result = projectUseCase.updateProject(update, existing.getOwnerId());
 		assertThat(result).isNotNull();
-		assertThat(result.getUid()).isEqualTo(existing.getUid());
-		assertThat(result.getOwnerId()).isEqualTo(existing.getOwnerId());
+		assertThat(result).isEqualTo(existing);
+		verify(projectPersistencePort).findByUid(existing.getUid());
+		verify(updateFieldMapper).updateProject(update, existing);
 		verify(projectPersistencePort).save(existing);
 	}
 
