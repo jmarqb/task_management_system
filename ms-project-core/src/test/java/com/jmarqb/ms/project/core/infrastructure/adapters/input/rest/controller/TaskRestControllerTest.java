@@ -80,7 +80,7 @@ class TaskRestControllerTest {
 		Claims claims = mock(Claims.class);
 		CustomAuthenticationDetails authDetails = mock(CustomAuthenticationDetails.class);
 		when(authDetails.claims()).thenReturn(claims);
-		when(claims.get(eq("id"), eq(Long.class))).thenReturn(userId);
+		when(claims.get("id", Long.class)).thenReturn(userId);
 
 		Authentication authentication = mock(Authentication.class);
 		when(authentication.getDetails()).thenReturn(authDetails);
@@ -114,7 +114,6 @@ class TaskRestControllerTest {
 		params.setSort("ASC");
 
 		List<Task> tasks = List.of(task);
-		List<TaskResponseDto> responses = List.of(responseDto);
 
 		when(taskUseCase.searchAll(anyInt(), anyInt(), anyString(), eq(1L))).thenReturn(tasks);
 		when(taskMapper.toResponseD(any())).thenReturn(responseDto);
@@ -153,22 +152,22 @@ class TaskRestControllerTest {
 		patchDto.setPriority("HIGH");
 		patchDto.setName("Tarea de prueba");
 
-		Task task = new Task();
-		task.setUid(uid);
+		Task newTask = new Task();
+		newTask.setUid(uid);
 		Project project = new Project();
 		project.setUid(UUID.randomUUID().toString());
-		task.setProject(project);
+		newTask.setProject(project);
 
-		TaskResponseDto responseDto = new TaskResponseDto();
-		responseDto.setUid(uid);
-		responseDto.setStatus("IN_PROGRESS");
-		responseDto.setPriority("HIGH");
-		responseDto.setName("Tarea de prueba");
-		responseDto.setProjectId(project.getUid());
+		TaskResponseDto localResponseDto = new TaskResponseDto();
+		localResponseDto.setUid(uid);
+		localResponseDto.setStatus("IN_PROGRESS");
+		localResponseDto.setPriority("HIGH");
+		localResponseDto.setName("Tarea de prueba");
+		localResponseDto.setProjectId(project.getUid());
 
-		when(taskMapper.toDomain(any(PatchTaskDto.class))).thenReturn(task);
-		when(taskUseCase.updateTask(eq(task), eq(1L))).thenReturn(task);
-		when(taskMapper.toResponse(eq(task), eq(project.getUid()))).thenReturn(responseDto);
+		when(taskMapper.toDomain(any(PatchTaskDto.class))).thenReturn(newTask);
+		when(taskUseCase.updateTask(newTask, 1L)).thenReturn(newTask);
+		when(taskMapper.toResponse(newTask, project.getUid())).thenReturn(localResponseDto);
 
 		mockMvc.perform(patch("/api/v1/tasks/{uid}", uid)
 			.contentType(MediaType.APPLICATION_JSON)

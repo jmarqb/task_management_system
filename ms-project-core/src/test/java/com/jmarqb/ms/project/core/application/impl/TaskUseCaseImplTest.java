@@ -26,8 +26,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -114,9 +113,9 @@ class TaskUseCaseImplTest {
 		Pagination pagination = new Pagination(0, 10, "asc", "id");
 		List<Task> expected = List.of(Instancio.create(Task.class));
 
-		when(taskPersistencePort.searchAll(eq(pagination), eq(1L))).thenReturn(expected);
+		when(taskPersistencePort.searchAll(any(Pagination.class), anyLong())).thenReturn(expected);
 
-		List<Task> result = taskUseCase.searchAll(0, 10, "asc", 1L);
+		List<Task> result = taskUseCase.searchAll(pagination.page(), pagination.size(), pagination.sort(),1L);
 
 		assertThat(result).isEqualTo(expected);
 	}
@@ -127,10 +126,10 @@ class TaskUseCaseImplTest {
 		String projectUid = UUID.randomUUID().toString();
 		List<Task> expected = List.of(Instancio.create(Task.class));
 
-		when(taskPersistencePort.findByProjectUid(eq(pagination), eq(projectUid)))
+		when(taskPersistencePort.findByProjectUid(any(Pagination.class), anyString()))
 			.thenReturn(expected);
 
-		List<Task> result = taskUseCase.searchAllByProjectUid(projectUid, 0, 10, "desc");
+		List<Task> result = taskUseCase.searchAllByProjectUid(projectUid, pagination.page(), pagination.size(), pagination.sort());
 
 		assertThat(result).isEqualTo(expected);
 	}

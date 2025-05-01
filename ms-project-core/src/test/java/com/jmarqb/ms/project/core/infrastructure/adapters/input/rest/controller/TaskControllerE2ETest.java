@@ -59,7 +59,7 @@ import static org.instancio.Select.field;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import({SecurityConfig.class, TestDataInitializer.class})
-public class TaskControllerE2ETest {
+class TaskControllerE2ETest {
 
 	@Autowired
 	private TestRestTemplate client;
@@ -189,8 +189,8 @@ public class TaskControllerE2ETest {
 
 		PaginatedResponseDto body = response.getBody();
 		assertThat(body).isNotNull();
-		assertThat(body.getData().size()).isEqualTo(2);
-		assertThat(body.getPage()).isEqualTo(0);
+		assertThat(body.getData()).hasSize(2);
+		assertThat(body.getPage()).isZero();
 		assertThat(body.getSize()).isEqualTo(20);
 		assertThat(body.getTotal()).isEqualTo(2);
 	}
@@ -307,14 +307,14 @@ public class TaskControllerE2ETest {
 	}
 
 	public void checkedErrorResponseEntity(ResponseEntity<Error> response, String projectUid, HttpStatus status) {
-		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+		assertThat(response.getStatusCode()).isEqualTo(status);
 		assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
 
 		Error body = response.getBody();
 
 		assertThat(body).isNotNull();
 
-		assertThat(body.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
+		assertThat(body.getStatus()).isEqualTo(status.value());
 		assertThat(body.getError()).isEqualTo("NOT FOUND");
 		assertThat(body.getMessage()).isEqualTo("Task with id " + projectUid + " not found");
 	}
