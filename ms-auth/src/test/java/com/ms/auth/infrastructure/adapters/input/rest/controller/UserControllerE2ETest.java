@@ -21,10 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.ms.auth.application.ports.input.JwtUseCase;
 import com.ms.auth.data.seed.TestDataInitializer;
-import com.ms.auth.domain.model.CustomUserDetails;
-import com.ms.auth.domain.model.Error;
+import com.ms.auth.infrastructure.adapters.input.rest.advice.Error;
 import com.ms.auth.infrastructure.adapters.input.rest.dtos.request.CreateUserDto;
 import com.ms.auth.infrastructure.adapters.input.rest.dtos.request.SearchBodyDto;
 import com.ms.auth.infrastructure.adapters.input.rest.dtos.request.UpdateUserDto;
@@ -32,6 +30,8 @@ import com.ms.auth.infrastructure.adapters.input.rest.dtos.response.CreateUserRe
 import com.ms.auth.infrastructure.adapters.input.rest.dtos.response.DeleteResponseDto;
 import com.ms.auth.infrastructure.adapters.input.rest.dtos.response.PaginatedResponseDto;
 import com.ms.auth.infrastructure.security.config.SpringSecurityConfig;
+import com.ms.auth.infrastructure.security.model.CustomUserDetails;
+import com.ms.auth.infrastructure.security.service.JwtService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -54,7 +54,7 @@ public class UserControllerE2ETest {
 	private TestRestTemplate client;
 
 	@Autowired
-	private JwtUseCase jwtService;
+	private JwtService jwtService;
 
 	private String token;
 

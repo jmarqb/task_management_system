@@ -1,11 +1,10 @@
-package com.ms.auth.application.impl;
+package com.ms.auth.infrastructure.security.service;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,14 +12,13 @@ import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 
-import com.ms.auth.domain.model.CustomUserDetails;
 import com.ms.auth.domain.model.User;
 import com.ms.auth.domain.ports.output.persistence.UserPersistencePort;
+import com.ms.auth.infrastructure.security.model.CustomUserDetails;
 
 @Component
 @RequiredArgsConstructor
-@Transactional
-public class JpaUserDetailsUseCaseImpl implements UserDetailsService {
+public class JpaUserDetails implements UserDetailsService {
 
 	private final UserPersistencePort userPersistencePort;
 

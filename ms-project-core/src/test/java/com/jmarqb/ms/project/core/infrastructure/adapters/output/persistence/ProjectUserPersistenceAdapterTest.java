@@ -1,15 +1,16 @@
 package com.jmarqb.ms.project.core.infrastructure.adapters.output.persistence;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import com.jmarqb.ms.project.core.application.enums.ProjectUserRole;
+import com.jmarqb.ms.project.core.application.vo.ProjectUserRole;
 import com.jmarqb.ms.project.core.domain.model.ProjectUser;
 import com.jmarqb.ms.project.core.infrastructure.adapters.output.persistence.mapper.ProjectUserPersistenceMapper;
 import com.jmarqb.ms.project.core.infrastructure.adapters.output.persistence.model.ProjectEntity;
 import com.jmarqb.ms.project.core.infrastructure.adapters.output.persistence.model.ProjectUserEntity;
 import com.jmarqb.ms.project.core.infrastructure.adapters.output.persistence.repository.ProjectUserRepository;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

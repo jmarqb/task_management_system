@@ -1,8 +1,8 @@
 package com.jmarqb.ms.project.core.application.ports.input;
 
-import java.util.List;
-
 import com.jmarqb.ms.project.core.domain.model.Task;
+
+import java.util.List;
 
 public interface TaskUseCase {
 

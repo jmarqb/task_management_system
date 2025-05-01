@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.ms.auth.domain.model.Pagination;
 import com.ms.auth.domain.model.User;
 import com.ms.auth.infrastructure.adapters.output.persistence.mapper.RolePersistenceMapper;
 import com.ms.auth.infrastructure.adapters.output.persistence.mapper.UserPersistenceMapper;
@@ -40,6 +41,7 @@ class UserPersistenceAdapterTest {
 	private User user;
 
 	private Pageable pageable;
+	private final Pagination pagination = new Pagination(0, 10, "ASC", "id");
 
 	@BeforeEach
 	void setUp() {
@@ -61,7 +63,8 @@ class UserPersistenceAdapterTest {
 			.set(field(UserEntity::getRoles), user.getRoles())
 			.create();
 
-		pageable = PageRequest.of(0, 20, Sort.Direction.ASC, "id");
+		pageable = PageRequest.of(pagination.page(), pagination.size(), "asc".equalsIgnoreCase(pagination.sort()) ?
+			Sort.Direction.ASC : Sort.Direction.DESC, pagination.sortBy());
 	}
 
 
@@ -166,7 +169,7 @@ class UserPersistenceAdapterTest {
 		when(userPersistenceMapper.toUserListWithRoles(userRepository.searchAll(pageable), rolePersistenceMapper))
 			.thenReturn(users);
 
-		List<User> result = userPersistenceAdapter.searchAll(pageable);
+		List<User> result = userPersistenceAdapter.searchAll(pagination);
 
 		assertThat(result).isEqualTo(users);
 
@@ -181,7 +184,7 @@ class UserPersistenceAdapterTest {
 		when(userPersistenceMapper.toUserListWithRoles(userRepository.searchAllByRegex("name", pageable), rolePersistenceMapper))
 			.thenReturn(users);
 
-		List<User> result = userPersistenceAdapter.searchAllByRegex("name", pageable);
+		List<User> result = userPersistenceAdapter.searchAllByRegex("name", pagination);
 
 		assertThat(result).isEqualTo(users);
 

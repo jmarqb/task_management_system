@@ -15,7 +15,7 @@ import java.util.List;
 
 import com.ms.auth.application.ports.input.UserUseCase;
 import com.ms.auth.data.seed.TestDataInitializer;
-import com.ms.auth.domain.model.Error;
+import com.ms.auth.infrastructure.adapters.input.rest.advice.Error;
 import com.ms.auth.infrastructure.adapters.input.rest.dtos.request.CreateUserDto;
 import com.ms.auth.infrastructure.adapters.input.rest.dtos.response.CreateUserResponseDto;
 import com.ms.auth.infrastructure.security.config.SpringSecurityConfig;

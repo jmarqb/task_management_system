@@ -5,8 +5,8 @@ import jakarta.validation.constraints.Min;
 import lombok.Builder;
 import lombok.Data;
 
-import com.ms.auth.application.enums.Sort;
 import com.ms.auth.infrastructure.adapters.validation.ValueOfEnum;
+import com.ms.auth.infrastructure.adapters.vo.Sort;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Builder

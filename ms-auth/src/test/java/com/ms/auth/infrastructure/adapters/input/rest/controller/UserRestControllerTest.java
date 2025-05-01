@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ms.auth.application.enums.Gender;
 import com.ms.auth.application.ports.input.UserUseCase;
 import com.ms.auth.domain.model.Role;
 import com.ms.auth.domain.model.User;
@@ -30,6 +29,7 @@ import com.ms.auth.infrastructure.adapters.input.rest.dtos.response.DeleteRespon
 import com.ms.auth.infrastructure.adapters.input.rest.dtos.response.PaginatedResponseDto;
 import com.ms.auth.infrastructure.adapters.input.rest.dtos.response.UserRole;
 import com.ms.auth.infrastructure.adapters.input.rest.mapper.UserMapper;
+import com.ms.auth.infrastructure.adapters.vo.Gender;
 import com.ms.auth.infrastructure.security.config.SpringSecurityConfig;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;

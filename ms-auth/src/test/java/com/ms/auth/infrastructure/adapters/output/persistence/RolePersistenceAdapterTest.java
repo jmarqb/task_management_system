@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.ms.auth.domain.model.Pagination;
 import com.ms.auth.domain.model.Role;
 import com.ms.auth.infrastructure.adapters.output.persistence.mapper.RolePersistenceMapper;
 import com.ms.auth.infrastructure.adapters.output.persistence.model.RoleEntity;
@@ -38,6 +39,8 @@ class RolePersistenceAdapterTest {
 	private Role role;
 
 	private Pageable pageable;
+	private final Pagination pagination = new Pagination(0, 10, "ASC", "id");
+
 
 	@BeforeEach
 	void setUp() {
@@ -58,7 +61,8 @@ class RolePersistenceAdapterTest {
 			.set(field(RoleEntity::getDeletedAt), role.getDeletedAt())
 			.create();
 
-		pageable = PageRequest.of(0, 20, Sort.Direction.ASC, "id");
+		pageable = PageRequest.of(pagination.page(), pagination.size(), "asc".equalsIgnoreCase(pagination.sort()) ?
+			Sort.Direction.ASC : Sort.Direction.DESC, pagination.sortBy());
 	}
 
 	@Test
@@ -80,7 +84,7 @@ class RolePersistenceAdapterTest {
 		when(roleRepository.searchAll(pageable)).thenReturn(List.of(roleEntity, roleEntity));
 		when(rolePersistenceMapper.toRoleList(List.of(roleEntity, roleEntity))).thenReturn(List.of(role, role));
 
-		List<Role> result = rolePersistenceAdapter.searchAll(pageable);
+		List<Role> result = rolePersistenceAdapter.searchAll(pagination);
 
 		assertThat(result).isEqualTo(List.of(role, role));
 
@@ -93,7 +97,7 @@ class RolePersistenceAdapterTest {
 		when(roleRepository.searchAllByRegex("nameRole", pageable)).thenReturn(List.of(roleEntity, roleEntity));
 		when(rolePersistenceMapper.toRoleList(List.of(roleEntity, roleEntity))).thenReturn(List.of(role, role));
 
-		List<Role> result = rolePersistenceAdapter.searchAllByRegex("nameRole", pageable);
+		List<Role> result = rolePersistenceAdapter.searchAllByRegex("nameRole", pagination);
 
 		assertThat(result).isEqualTo(List.of(role, role));
 

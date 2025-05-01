@@ -1,9 +1,9 @@
-package com.ms.auth.application.impl;
+package com.ms.auth.infrastructure.security.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
@@ -11,22 +11,20 @@ import java.util.Date;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ms.auth.application.ports.input.JwtUseCase;
-import com.ms.auth.domain.model.CustomUserDetails;
+import com.ms.auth.infrastructure.security.model.CustomUserDetails;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import javax.crypto.SecretKey;
 
-@Component
-public class JwtUseCaseImpl implements JwtUseCase {
+@Service
+public class JwtService {
 	private final SecretKey SECRET_KEY;
 
-	public JwtUseCaseImpl(@Value("${jwt.private}") String secret) {
+	public JwtService(@Value("${jwt.private}") String secret) {
 		SECRET_KEY = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
 	}
 
-	@Override
 	public String generateToken(CustomUserDetails user) throws JsonProcessingException {
 		String username = user.getUsername();
 		Collection<GrantedAuthority> roles = user.getAuthorities();
@@ -47,7 +45,6 @@ public class JwtUseCaseImpl implements JwtUseCase {
 			.compact();
 	}
 
-	@Override
 	public String extractUsername(String token) {
 		return Jwts.parser()
 			.verifyWith(SECRET_KEY)
@@ -58,13 +55,11 @@ public class JwtUseCaseImpl implements JwtUseCase {
 			.getSubject();
 	}
 
-	@Override
 	public boolean isTokenValid(String token, UserDetails userDetails) {
 		String username = extractUsername(token);
 		return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
 	}
 
-	@Override
 	public boolean isTokenExpired(String token) {
 		try {
 			Date expiration = Jwts.parser()

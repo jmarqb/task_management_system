@@ -22,8 +22,8 @@ styleConfigs:
       classCountToUseStarImport: 999
       nameCountToUseStarImport: 999
       layout:
-        - import com.jmarqb.task.management.system.*
-        - import static com.jmarqb.task.management.system.*
+        - import com.jmarqb.*
+        - import static com.jmarqb.*
         - <blank line>
         - import org.springframework.*
         - import static org.springframework.*

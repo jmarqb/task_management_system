@@ -1,4 +1,4 @@
-package com.ms.auth.domain.model;
+package com.ms.auth.infrastructure.adapters.input.rest.advice;
 
 import java.time.LocalDateTime;
 import java.util.List;

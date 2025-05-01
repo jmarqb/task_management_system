@@ -10,10 +10,10 @@ import lombok.Builder;
 import lombok.Data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ms.auth.application.enums.Gender;
 import com.ms.auth.infrastructure.adapters.validation.ExistEmail;
 import com.ms.auth.infrastructure.adapters.validation.ExistPhone;
 import com.ms.auth.infrastructure.adapters.validation.ValueOfEnum;
+import com.ms.auth.infrastructure.adapters.vo.Gender;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Builder

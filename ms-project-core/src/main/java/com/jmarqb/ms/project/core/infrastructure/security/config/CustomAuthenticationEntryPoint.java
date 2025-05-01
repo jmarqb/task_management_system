@@ -1,5 +1,7 @@
 package com.jmarqb.ms.project.core.infrastructure.security.config;
 
+import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.advice.Error;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -12,7 +14,6 @@ import java.time.LocalDateTime;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.jmarqb.ms.project.core.domain.model.Error;
 
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
 	@Override

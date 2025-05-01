@@ -1,19 +1,22 @@
 package com.jmarqb.ms.project.core.infrastructure.adapters.output.persistence;
 
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import com.jmarqb.ms.project.core.application.enums.PriorityStatus;
-import com.jmarqb.ms.project.core.application.enums.TaskStatus;
+import com.jmarqb.ms.project.core.application.vo.PriorityStatus;
+import com.jmarqb.ms.project.core.application.vo.TaskStatus;
+import com.jmarqb.ms.project.core.domain.model.Pagination;
 import com.jmarqb.ms.project.core.domain.model.Task;
 import com.jmarqb.ms.project.core.infrastructure.adapters.output.persistence.mapper.TaskPersistenceMapper;
 import com.jmarqb.ms.project.core.infrastructure.adapters.output.persistence.model.ProjectEntity;
 import com.jmarqb.ms.project.core.infrastructure.adapters.output.persistence.model.TaskEntity;
 import com.jmarqb.ms.project.core.infrastructure.adapters.output.persistence.repository.TaskRepository;
+
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,6 +40,7 @@ class TaskPersistenceAdapterTest {
 	private Task task;
 	private ProjectEntity projectEntity;
 	private Pageable pageable;
+	private final Pagination pagination = new Pagination(0, 10, "ASC", "id");
 
 	@BeforeEach
 	void setUp() {
@@ -69,7 +73,8 @@ class TaskPersistenceAdapterTest {
 			.set(field(TaskEntity::getProject), projectEntity)
 			.create();
 
-		pageable = PageRequest.of(0, 10);
+		pageable = PageRequest.of(pagination.page(), pagination.size(), "asc".equalsIgnoreCase(pagination.sort()) ?
+			Sort.Direction.ASC : Sort.Direction.DESC, pagination.sortBy());
 	}
 
 	@Test
@@ -91,7 +96,7 @@ class TaskPersistenceAdapterTest {
 		when(taskRepository.searchAll(pageable, task.getAssignedUserId())).thenReturn(List.of(taskEntity));
 		when(taskPersistenceMapper.toTasksList(List.of(taskEntity))).thenReturn(List.of(task));
 
-		List<Task> result = taskPersistenceAdapter.searchAll(pageable, task.getAssignedUserId());
+		List<Task> result = taskPersistenceAdapter.searchAll(pagination, task.getAssignedUserId());
 
 		assertThat(result).isEqualTo(List.of(task));
 		verify(taskRepository).searchAll(pageable, task.getAssignedUserId());
@@ -115,7 +120,7 @@ class TaskPersistenceAdapterTest {
 		when(taskRepository.findByProjectUid(pageable, projectEntity.getUid())).thenReturn(List.of(taskEntity));
 		when(taskPersistenceMapper.toTasksList(List.of(taskEntity))).thenReturn(List.of(task));
 
-		List<Task> result = taskPersistenceAdapter.findByProjectUid(pageable, projectEntity.getUid());
+		List<Task> result = taskPersistenceAdapter.findByProjectUid(pagination, projectEntity.getUid());
 
 		assertThat(result).isEqualTo(List.of(task));
 		verify(taskRepository).findByProjectUid(pageable, projectEntity.getUid());
@@ -127,7 +132,7 @@ class TaskPersistenceAdapterTest {
 		when(taskRepository.findByAssignedUserId(pageable, task.getAssignedUserId())).thenReturn(List.of(taskEntity));
 		when(taskPersistenceMapper.toTasksList(List.of(taskEntity))).thenReturn(List.of(task));
 
-		List<Task> result = taskPersistenceAdapter.findByAssignedUserId(pageable, task.getAssignedUserId());
+		List<Task> result = taskPersistenceAdapter.findByAssignedUserId(pagination, task.getAssignedUserId());
 
 		assertThat(result).isEqualTo(List.of(task));
 		verify(taskRepository).findByAssignedUserId(pageable, task.getAssignedUserId());
@@ -141,7 +146,7 @@ class TaskPersistenceAdapterTest {
 		when(taskPersistenceMapper.toTasksList(List.of(taskEntity))).thenReturn(List.of(task));
 
 		List<Task> result = taskPersistenceAdapter.findByProjectUidAndAssignedUserIdPaginated(
-			projectEntity.getUid(), task.getAssignedUserId(), pageable
+			projectEntity.getUid(), task.getAssignedUserId(), pagination
 		);
 
 		assertThat(result).isEqualTo(List.of(task));

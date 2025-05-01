@@ -1,4 +1,4 @@
-package com.jmarqb.ms.project.core.application.enums;
+package com.jmarqb.ms.project.core.application.vo;
 
 public enum TaskStatus {
 	PENDING,

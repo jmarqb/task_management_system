@@ -18,7 +18,6 @@ import java.util.List;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ms.auth.data.seed.TestDataInitializer;
-import com.ms.auth.domain.model.Error;
 import com.ms.auth.infrastructure.adapters.input.rest.dtos.request.CreateRoleDto;
 import com.ms.auth.infrastructure.security.config.SpringSecurityConfig;
 import io.jsonwebtoken.Claims;

@@ -1,5 +1,9 @@
 package com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.advice;
 
+import com.jmarqb.ms.project.core.data.seed.TestDataInitializer;
+import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.request.CreateProjectDto;
+import com.jmarqb.ms.project.core.infrastructure.security.config.SecurityConfig;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -17,16 +21,11 @@ import java.util.List;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jmarqb.ms.project.core.data.seed.TestDataInitializer;
-import com.jmarqb.ms.project.core.domain.model.Error;
-import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.dtos.request.CreateProjectDto;
-import com.jmarqb.ms.project.core.infrastructure.security.config.SecurityConfig;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import javax.crypto.SecretKey;
 import org.junit.jupiter.api.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 

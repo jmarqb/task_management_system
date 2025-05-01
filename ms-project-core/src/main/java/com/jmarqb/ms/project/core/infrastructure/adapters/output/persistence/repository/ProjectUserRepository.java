@@ -1,13 +1,13 @@
 package com.jmarqb.ms.project.core.infrastructure.adapters.output.persistence.repository;
 
+import com.jmarqb.ms.project.core.domain.model.ProjectUser;
+import com.jmarqb.ms.project.core.infrastructure.adapters.output.persistence.model.ProjectUserEntity;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-
-import com.jmarqb.ms.project.core.domain.model.ProjectUser;
-import com.jmarqb.ms.project.core.infrastructure.adapters.output.persistence.model.ProjectUserEntity;
 
 public interface ProjectUserRepository extends JpaRepository<ProjectUserEntity, String> {
 

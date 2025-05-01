@@ -4,7 +4,6 @@ package com.ms.auth.data;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ms.auth.application.enums.Gender;
 import com.ms.auth.domain.model.Role;
 import com.ms.auth.domain.model.User;
 import com.ms.auth.infrastructure.adapters.input.rest.dtos.request.CreateRoleDto;
@@ -13,6 +12,7 @@ import com.ms.auth.infrastructure.adapters.input.rest.dtos.request.SearchBodyDto
 import com.ms.auth.infrastructure.adapters.input.rest.dtos.response.CreateRoleResponseDto;
 import com.ms.auth.infrastructure.adapters.input.rest.dtos.response.CreateUserResponseDto;
 import com.ms.auth.infrastructure.adapters.input.rest.dtos.response.UserRole;
+import com.ms.auth.infrastructure.adapters.vo.Gender;
 
 public class Data {
 	public static CreateRoleDto createRoleAdmin() {
