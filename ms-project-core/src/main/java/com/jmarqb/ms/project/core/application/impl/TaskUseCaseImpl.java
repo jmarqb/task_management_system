@@ -117,7 +117,7 @@ public class TaskUseCaseImpl implements TaskUseCase {
 	}
 
 	private Pagination buildPagination(int page, int size, String sort) {
-		return new Pagination(page, size, sort, "id");
+		return new Pagination(page, size, sort, "uid");
 	}
 
 	private void assignTaskUser(Task task, Long userId) {

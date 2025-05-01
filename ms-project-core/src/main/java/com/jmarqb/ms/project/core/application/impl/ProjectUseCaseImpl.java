@@ -69,7 +69,7 @@ public class ProjectUseCaseImpl implements ProjectUseCase {
 	public List<Project> searchAll(int page, int size, String sort, Long userId) {
 		List<Project> projects;
 
-		Pagination pagination = new Pagination(page, size, sort, "id");
+		Pagination pagination = new Pagination(page, size, sort, "uid");
 
 		projects = projectPersistencePort.searchAll(pagination, userId);
 
