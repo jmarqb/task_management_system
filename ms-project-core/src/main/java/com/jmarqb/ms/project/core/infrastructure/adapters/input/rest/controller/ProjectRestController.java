@@ -17,6 +17,7 @@ import com.jmarqb.ms.project.core.infrastructure.adapters.input.rest.ui.ProjectR
 import com.jmarqb.ms.project.core.infrastructure.adapters.output.external.dtos.ValidateUsersDto;
 import com.jmarqb.ms.project.core.infrastructure.security.CustomAuthenticationDetails;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -27,7 +28,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
-
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 public class ProjectRestController implements ProjectRestUI {
@@ -94,6 +95,7 @@ public class ProjectRestController implements ProjectRestUI {
 				projectUserMapper, taskMapper);
 			return ResponseEntity.status(HttpStatus.OK).body(response);
 		} catch (Exception e) {
+			log.error(e.getMessage());
 			throw e;
 		}
 	}
@@ -105,6 +107,7 @@ public class ProjectRestController implements ProjectRestUI {
 			return ResponseEntity.status(HttpStatus.OK).body(projectMapper.toResponseFormatted(project,
 				projectUserMapper, taskMapper));
 		} catch (Exception e) {
+			log.error(e.getMessage());
 			throw e;
 		}
 	}
