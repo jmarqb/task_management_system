@@ -1,0 +1,44 @@
+name: TASK MANAGEMENT SYSTEM Test Report
+on:
+  push:
+    branches:
+      - main
+      - hotfix/**
+  pull_request:
+
+permissions:
+  contents: read
+  actions: read
+  checks: write
+jobs:
+  task_management_system:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'liberica'
+          java-version: '21.0.5'
+          java-package: 'jdk'
+      - name: Test Step
+        run: mvn test
+      - name: Test Report
+        uses: dorny/test-reporter@v1.9.1
+        if: success() || failure()
+        with:
+          name: junit Report
+          path: '**/target/test-results/**/TEST-*.xml'
+          reporter: java-junit
+      - name: JaCoCo Report
+        uses: Madrapps/jacoco-report@v1.7.1
+        with:
+          paths: ${{ github.workspace }}/**/target/site/jacoco/jacoco.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: Code Coverage
+          update-comment: true
+      - name: Get the Coverage info
+        run: |
+          echo "Total coverage ${{ steps.jacoco.outputs.coverage-overall }}"
+          echo "Changed Files coverage ${{ steps.jacoco.outputs.coverage-changed-files }}"
