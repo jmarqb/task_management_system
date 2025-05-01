@@ -23,6 +23,7 @@ public interface ProjectMapper {
 	@Mapping(target = "members", source = "userList")
 	Project toDomain(CreateProjectDto createProjectDto, List<User> userList);
 
+	@Mapping(target="archived", source = "archived")
 	Project toDomain(PatchProjectDto patchProjectDto);
 
 	@Mapping(target = "uid", source = "project.uid")

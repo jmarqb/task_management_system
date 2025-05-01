@@ -28,8 +28,8 @@ public class ProjectResponseDto {
 	@Schema(description = "description", example = "Project Description")
 	private String description;
 
-	@Schema(description = "isArchived", example = "false")
-	private boolean isArchived;
+	@Schema(description = "archived", example = "false")
+	private boolean archived;
 
 	@Schema(description = "ownerId", example = "1")
 	private Long ownerId;

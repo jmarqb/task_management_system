@@ -35,5 +35,5 @@ public class CreateProjectDto {
 
 	@JsonIgnore
 	@Schema(hidden = true, defaultValue = "false")
-	private boolean isArchived;
+	private boolean archived;
 }

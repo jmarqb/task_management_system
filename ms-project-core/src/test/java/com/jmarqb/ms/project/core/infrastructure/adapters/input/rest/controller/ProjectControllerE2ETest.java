@@ -238,7 +238,7 @@ class ProjectControllerE2ETest {
         PatchProjectDto patchProjectDto = PatchProjectDto.builder()
                 .name("UpdatedTestProject")
                 .description("UpdatedTestProjectDescription")
-                .isArchived(true)
+                .archived(false)
                 .build();
 
         HttpEntity<PatchProjectDto> entity = new HttpEntity<>(patchProjectDto);

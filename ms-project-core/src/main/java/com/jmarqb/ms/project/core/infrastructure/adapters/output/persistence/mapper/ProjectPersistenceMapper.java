@@ -12,14 +12,13 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface ProjectPersistenceMapper {
 
-	@Mapping(target = "archived", source = "archived")
 	ProjectEntity toEntity(Project project);
 
 	@Mapping(target = "members", ignore = true)
 	@Mapping(target = "tasks", ignore = true)
+	@Mapping(target = "archived", source = "archived")
 	Project toDomain(ProjectEntity projectEntity);
 
-	@Mapping(target = "isArchived", source = "archived")
 	List<Project> toProjectsList(List<ProjectEntity> projectEntities);
 
 	List<ProjectEntity> toProjectEntityList(List<Project> projects);

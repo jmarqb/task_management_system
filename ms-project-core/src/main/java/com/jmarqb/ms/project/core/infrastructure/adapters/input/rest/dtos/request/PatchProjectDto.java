@@ -31,6 +31,6 @@ public class PatchProjectDto {
 	@Size(min = 3, max = 50, message = "description must be between 3 and 50 characters")
 	private String description;
 
-	@Schema(description = "Optional isArchived update", example = "true")
-	private boolean isArchived;
+	@Schema(description = "Optional archived update", example = "true")
+	private boolean archived;
 }

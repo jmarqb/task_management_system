@@ -103,7 +103,7 @@ class ProjectUseCaseImplTest {
                 .deleted(false)
                 .deletedAt(null)
                 .description("new description")
-                .isArchived(false)
+                .archived(false)
                 .build();
 
         Project existing = Instancio.create(Project.class);

@@ -22,7 +22,7 @@ public class Project {
 
 	private String description;
 
-	private boolean isArchived;
+	private boolean archived;
 
 	private Long ownerId;
 
