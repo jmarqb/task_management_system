@@ -25,7 +25,7 @@ jobs:
       - name: Test Step
         run: mvn test
       - name: Test Report
-        uses: dorny/test-reporter@v2.0.0
+        uses: dorny/test-reporter@v2.1.1
         if: success() || failure()
         with:
           name: junit Report
